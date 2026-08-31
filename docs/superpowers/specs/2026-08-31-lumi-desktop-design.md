@@ -33,7 +33,8 @@ Lumi é um app gratuito para desktop (Windows e Mac) com um personagem — um ax
 - Zero interrupção fora dos momentos de intervenção.
 
 ### 2.3 Intervenções
-- Gatilho padrão: a cada **50 minutos de uso ativo contínuo** do computador (configurável: 30/50/60/90 min). Tempo ocioso (almoço, reunião fora do PC) pausa o contador.
+- Gatilho padrão: a cada **50 minutos de uso ativo contínuo** do computador (configurável: 30/50/60/90 min). Tempo ocioso curto (5-15 min, ex.: reunião rápida) pausa o contador; ocioso longo (15+ min, ex.: almoço) **zera** o contador — a pessoa acabou de descansar, não faz sentido pedir pausa logo ao voltar.
+- Ao expirar o modo "Em atendimento", o Lumi espera uma folga de ~5 minutos antes de intervir (nunca "pula" na pessoa no segundo em que o silêncio acaba).
 - Momento da intervenção: o Lumi acorda, atravessa a tela nadando, e chama o usuário com um balão. O usuário pode aceitar, adiar ("daqui a 10 min") ou dispensar.
 - Rodízio equilibrado entre 4 tipos:
   1. **Micro-pausa física** — alongar, beber água, olhar para longe (regra 20-20-20). ~10 variações.
