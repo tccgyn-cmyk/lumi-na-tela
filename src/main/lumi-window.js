@@ -2,7 +2,7 @@ const { BrowserWindow, screen } = require('electron');
 const path = require('path');
 
 const WIN_W = 260;
-const WIN_H = 250;
+const WIN_H = 320;
 
 function homePosition() {
   const { workArea } = screen.getPrimaryDisplay();

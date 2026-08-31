@@ -2,6 +2,7 @@ const lumiEl = document.getElementById('lumi');
 const bubble = document.getElementById('bubble');
 const bubbleText = document.getElementById('bubble-text');
 const bubbleActions = document.getElementById('bubble-actions');
+const eyesEl = document.querySelector('.eyes');
 
 // Click-through dinâmico: só captura o mouse sobre o Lumi ou o balão.
 // Envia IPC apenas quando o estado muda (evita tempestade de mensagens).
@@ -14,7 +15,7 @@ function setIgnore(next) {
 }
 
 document.addEventListener('mousemove', (e) => {
-  const interactive = e.target.closest('#lumi, #bubble');
+  const interactive = e.target instanceof Element ? e.target.closest('#lumi, #bubble') : null;
   setIgnore(!interactive);
 });
 
@@ -23,6 +24,20 @@ document.addEventListener('mouseleave', () => setIgnore(true));
 document.addEventListener('mouseout', (e) => {
   if (e.relatedTarget === null) setIgnore(true);
 });
+window.addEventListener('blur', () => setIgnore(true));
+
+// Piscar controlado por JS: evita manter uma animação CSS infinita rodando sempre.
+function scheduleBlink() {
+  const delay = 4000 + Math.random() * 3000;
+  setTimeout(() => {
+    if (eyesEl) {
+      eyesEl.classList.add('blinking');
+      setTimeout(() => eyesEl.classList.remove('blinking'), 200);
+    }
+    scheduleBlink();
+  }, delay);
+}
+scheduleBlink();
 
 // Menu de contexto no clique direito do Lumi
 lumiEl.addEventListener('contextmenu', (e) => {
@@ -34,11 +49,12 @@ lumiEl.addEventListener('contextmenu', (e) => {
 window.lumiAPI.onState((s) => {
   if (s.state) lumiEl.dataset.state = s.state;
   if (s.state === 'invite') {
-    bubbleText.textContent = s.message;
+    bubbleText.textContent = s.message || '';
     bubble.classList.remove('hidden');
     bubbleActions.classList.remove('hidden');
   } else {
     bubble.classList.add('hidden');
+    bubbleActions.classList.add('hidden');
   }
 });
 
