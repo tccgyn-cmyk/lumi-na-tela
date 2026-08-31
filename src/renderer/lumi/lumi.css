@@ -27,7 +27,7 @@ html, body {
 
 /* Piscar sob comando do JS (evita animação infinita rodando sempre) */
 .eyes {
-  transform-origin: 100px 72px;
+  transform-origin: 100px 74px;
 }
 .eyes.blinking {
   animation: blink-once 0.18s ease-in-out;
@@ -37,15 +37,21 @@ html, body {
   50% { transform: scaleY(0.08); }
 }
 
-/* Guelras balançam no hover */
-#lumi:hover .gills {
-  animation: wiggle 0.6s ease-in-out infinite;
+/* Chama e brilhos reagem ao hover */
+.flame { transform-origin: 100px 40px; }
+#lumi:hover .flame {
+  animation: flicker 0.7s ease-in-out infinite;
 }
-.gills-left { transform-origin: 76px 45px; }
-.gills-right { transform-origin: 124px 45px; }
-@keyframes wiggle {
-  0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(8deg); }
+@keyframes flicker {
+  0%, 100% { transform: scaleY(1) scaleX(1); }
+  50% { transform: scaleY(1.18) scaleX(0.92); }
+}
+#lumi:hover .sparkles {
+  animation: twinkle 0.9s ease-in-out infinite;
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
 }
 
 /* Andando: balanço mais rápido */
@@ -87,11 +93,11 @@ html, body {
   padding: 6px 10px;
   font-size: 12px;
   cursor: pointer;
-  background: #f0edff;
+  background: #e4f2ef;
   color: #3a3a3a;
 }
 .bubble-actions #btn-accept {
-  background: #ffb5c2;
+  background: #ffe08a;
   font-weight: 600;
 }
 .hidden { display: none !important; }
