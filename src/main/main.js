@@ -2,8 +2,11 @@ const { app, BrowserWindow, ipcMain, Menu, powerMonitor } = require('electron');
 const { createLumiWindow } = require('./lumi-window');
 const { Scheduler } = require('./scheduler');
 const { Rotation } = require('./rotation');
+const { walkToCenter, returnHome } = require('./intervention');
+const { convites } = require('../shared/content');
 
 const TICK_MS = 5000;
+const INVITE_TIMEOUT_MS = 2 * 60_000;
 
 // LUMI_DEV_INTERVAL=1 npm start → intervalo de 1 min para testar.
 // Valor inválido cai no padrão (o Scheduler rejeita, então validamos aqui).
@@ -21,11 +24,44 @@ function resolveIntervalMinutes() {
 let lumiWin = null;
 const scheduler = new Scheduler({ intervalMinutes: resolveIntervalMinutes() });
 const rotation = new Rotation(['micro-pausa', 'respiracao']);
+let currentTipo = null;
+let inviteTimeout = null;
+
+function lumiAlive() {
+  return lumiWin && !lumiWin.isDestroyed();
+}
+
+function pick(list) {
+  return list[Math.floor(Math.random() * list.length)];
+}
 
 function triggerIntervention() {
-  const tipo = rotation.next();
-  // Na Task 8 isto vira a travessia + balão. Por enquanto, log:
-  console.log(`[lumi] intervenção devida: ${tipo}`);
+  if (currentTipo || !lumiAlive()) return;
+  currentTipo = rotation.next();
+  // Durante o convite a janela fica interativa de forma determinística —
+  // nenhum clique no balão pode vazar pra aplicação de trás.
+  lumiWin.setIgnoreMouseEvents(false);
+  walkToCenter(lumiWin, pick(convites[currentTipo]), currentTipo);
+  inviteTimeout = setTimeout(() => handleResponse('timeout'), INVITE_TIMEOUT_MS);
+}
+
+function handleResponse(answer) {
+  if (!currentTipo) return;
+  const tipo = currentTipo;
+  currentTipo = null;
+  clearTimeout(inviteTimeout);
+  inviteTimeout = null;
+  if (lumiAlive()) {
+    lumiWin.setIgnoreMouseEvents(true, { forward: true });
+    returnHome(lumiWin);
+  }
+  if (answer === 'snooze') {
+    scheduler.snooze(Date.now(), 10);
+  }
+  if (answer === 'accept') {
+    // Na Task 9 isto abre o cartão de atividade. Por enquanto, log:
+    console.log(`[lumi] atividade aceita: ${tipo}`);
+  }
 }
 
 const gotLock = app.requestSingleInstanceLock();
@@ -45,8 +81,15 @@ if (!gotLock) {
       ipcMain.on('set-ignore-mouse', (e, ignore) => {
         const win = BrowserWindow.fromWebContents(e.sender);
         if (win === lumiWin && win && !win.isDestroyed()) {
+          if (currentTipo) return; // convite ativo: janela pinada interativa
           win.setIgnoreMouseEvents(Boolean(ignore), { forward: true });
         }
+      });
+
+      ipcMain.on('intervention-response', (e, answer) => {
+        const win = BrowserWindow.fromWebContents(e.sender);
+        if (!win || win !== lumiWin || win.isDestroyed()) return;
+        handleResponse(answer);
       });
 
       ipcMain.on('lumi-menu', (e) => {
