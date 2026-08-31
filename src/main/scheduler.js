@@ -1,7 +1,14 @@
+const GRACE_AFTER_SILENCE_MS = 5 * 60_000;
+
 class Scheduler {
-  constructor({ intervalMinutes = 50, idleThresholdSeconds = 300 } = {}) {
-    this.intervalMs = intervalMinutes * 60_000;
+  constructor({ intervalMinutes = 50, idleThresholdSeconds = 300, idleResetMinutes = 15 } = {}) {
+    const mins = Number(intervalMinutes);
+    if (!Number.isFinite(mins) || mins <= 0) {
+      throw new TypeError(`intervalMinutes inválido: ${intervalMinutes}`);
+    }
+    this.intervalMs = mins * 60_000;
     this.idleThresholdMs = idleThresholdSeconds * 1000;
+    this.idleResetMs = idleResetMinutes * 60_000;
     this.activeMs = 0;
     this.snoozedUntil = 0;
     this.silencedUntil = 0;
@@ -15,9 +22,25 @@ class Scheduler {
    * @returns {'intervention-due'|null}
    */
   tick(nowMs, idleSeconds, elapsedMs) {
-    if (idleSeconds * 1000 >= this.idleThresholdMs) return null;
+    const idleMs = idleSeconds * 1000;
+    if (idleMs >= this.idleThresholdMs) {
+      // Pausa curta (ex.: reunião) só pausa o contador; pausa longa
+      // (ex.: almoço) já foi descanso de verdade — zera o contador.
+      if (idleMs >= this.idleResetMs) this.activeMs = 0;
+      return null;
+    }
     this.activeMs += elapsedMs;
-    if (nowMs < this.snoozedUntil || nowMs < this.silencedUntil) return null;
+    if (nowMs < this.snoozedUntil) return null;
+    if (this.silencedUntil > 0) {
+      if (nowMs < this.silencedUntil) return null;
+      // "Em atendimento" acabou de expirar: dá uma folga antes de intervir,
+      // em vez de disparar no mesmo instante.
+      this.activeMs = Math.min(
+        this.activeMs,
+        Math.max(0, this.intervalMs - GRACE_AFTER_SILENCE_MS)
+      );
+      this.silencedUntil = 0;
+    }
     if (this.activeMs >= this.intervalMs) {
       this.activeMs = 0;
       return 'intervention-due';

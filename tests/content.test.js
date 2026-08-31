@@ -5,6 +5,7 @@ describe('Conteúdo', () => {
   it('tem pelo menos 10 micro-pausas com titulo e texto', () => {
     expect(microPausas.length).toBeGreaterThanOrEqual(10);
     for (const m of microPausas) {
+      expect(m.id).toBeTruthy();
       expect(m.titulo).toBeTruthy();
       expect(m.texto).toBeTruthy();
     }
@@ -26,5 +27,11 @@ describe('Conteúdo', () => {
   it('tem convites para cada tipo de atividade', () => {
     expect(convites['micro-pausa'].length).toBeGreaterThanOrEqual(3);
     expect(convites['respiracao'].length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('todo tipo do rodizio tem convites', () => {
+    for (const t of ['micro-pausa', 'respiracao']) {
+      expect(Array.isArray(convites[t]) && convites[t].length > 0).toBe(true);
+    }
   });
 });

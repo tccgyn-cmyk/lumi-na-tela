@@ -1,14 +1,14 @@
 const microPausas = [
-  { titulo: 'Regra 20-20-20', texto: 'A cada 20 minutos, olhe para algo a 20 passos de distância por 20 segundos. Seus olhos agradecem, showww!' },
-  { titulo: 'Hora da água', texto: 'Quando foi seu último gole de água? Levanta, enche a garrafa e hidrata esse cérebro que cuida de tanta gente.' },
-  { titulo: 'Espreguiça braba', texto: 'Braços pro alto, alonga o corpo inteiro como se tivesse acabado de acordar. Pode fazer barulhinho, ninguém tá julgando.' },
-  { titulo: 'Ombros soltos', texto: 'Sobe os ombros até as orelhas, segura 3 segundos... e soltaaa. Repete 3 vezes. A tensão do plantão não merece morar aí.' },
-  { titulo: 'Pescoço livre', texto: 'Devagarinho: orelha no ombro direito, depois no esquerdo. 15 segundos de cada lado. Sem pressa, sem dor.' },
-  { titulo: 'Caminhadinha', texto: 'Levanta e dá uma volta de 2 minutos. Vale ir até a janela, o corredor ou a cozinha. O prontuário te espera.' },
-  { titulo: 'Mãos que trabalham', texto: 'Abre e fecha as mãos 10 vezes, depois gira os punhos. Quem digita e examina o dia todo merece esse carinho.' },
-  { titulo: 'Postura de gente', texto: 'Pés no chão, coluna ereta, ombros relaxados. Ajusta a cadeira se precisar. Seu corpo é seu instrumento de trabalho.' },
-  { titulo: 'Olhar pro longe', texto: 'Vai até a janela e observa o ponto mais distante que conseguir por 30 segundos. Tela de perto o dia todo cansa demais.' },
-  { titulo: 'Respiro de pé', texto: 'Levanta, planta os dois pés no chão e respira fundo 3 vezes de olhos abertos. Pronto: recalibrou.' },
+  { id: '20-20-20', titulo: 'Regra 20-20-20', texto: 'A cada 20 minutos, olhe para algo a 20 passos de distância por 20 segundos. Seus olhos agradecem, showww!' },
+  { id: 'agua', titulo: 'Hora da água', texto: 'Quando foi seu último gole de água? Levanta, enche a garrafa e hidrata esse cérebro que cuida de tanta gente.' },
+  { id: 'espreguica', titulo: 'Espreguiça braba', texto: 'Braços pro alto, alonga o corpo inteiro como se tivesse acabado de acordar. Pode fazer barulhinho, ninguém tá julgando.' },
+  { id: 'ombros', titulo: 'Ombros soltos', texto: 'Sobe os ombros até as orelhas, segura 3 segundos... e soltaaa. Repete 3 vezes. A tensão do plantão não merece morar aí.' },
+  { id: 'pescoco', titulo: 'Pescoço livre', texto: 'Devagarinho: orelha no ombro direito, depois no esquerdo. 15 segundos de cada lado. Sem pressa, sem dor.' },
+  { id: 'caminhada', titulo: 'Caminhadinha', texto: 'Levanta e dá uma volta de 2 minutos. Vale ir até a janela, o corredor ou a cozinha. O prontuário te espera.' },
+  { id: 'maos', titulo: 'Mãos que trabalham', texto: 'Abre e fecha as mãos 10 vezes, depois gira os punhos. Quem digita e examina o dia todo merece esse carinho.' },
+  { id: 'postura', titulo: 'Postura de gente', texto: 'Pés no chão, coluna ereta, ombros relaxados. Ajusta a cadeira se precisar. Seu corpo é seu instrumento de trabalho.' },
+  { id: 'olhar-longe', titulo: 'Olhar pro longe', texto: 'Vai até a janela e observa o ponto mais distante que conseguir por 30 segundos. Tela de perto o dia todo cansa demais.' },
+  { id: 'respiro-pe', titulo: 'Respiro de pé', texto: 'Levanta, planta os dois pés no chão e respira fundo 3 vezes de olhos abertos. Pronto: recalibrou.' },
 ];
 
 const exercicios = [
@@ -81,10 +81,10 @@ const convites = {
     'Hora de levantar dessa cadeira, vai por mim. Bora?',
   ],
   respiracao: [
-    'Que tal respirar fundo comigo? Só uns minutinhos.',
-    'Bora acalmar a mente um pouquinho? Eu respiro junto!',
-    'Momento Lumi: uma respirada pra recarregar. Topa?',
-    'Pausa pra respirar? Eu te guio, é rapidinho.',
+    'Que tal uma pausa pra acalmar a mente? Eu te acompanho.',
+    'Bora fazer um exercício rapidinho de regulação? Eu vou junto!',
+    'Momento Lumi: vamos baixar a rotação um pouquinho? Topa?',
+    'Uns minutinhos pra cuidar da mente? Eu te guio, é rapidinho.',
   ],
 };
 

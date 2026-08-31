@@ -9,4 +9,14 @@ describe('Rotation', () => {
     expect(r.next()).toBe('micro-pausa');
     expect(r.next()).toBe('respiracao');
   });
+
+  it('cicla corretamente com 3 tipos (preparo para a fase 3)', () => {
+    const r = new Rotation(['a', 'b', 'c']);
+    expect([r.next(), r.next(), r.next(), r.next()]).toEqual(['a', 'b', 'c', 'a']);
+  });
+
+  it('rejeita lista vazia', () => {
+    expect(() => new Rotation([])).toThrow(TypeError);
+    expect(() => new Rotation()).toThrow(TypeError);
+  });
 });
