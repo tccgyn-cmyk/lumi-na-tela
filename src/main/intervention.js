@@ -1,20 +1,28 @@
 const { screen } = require('electron');
 const { WIN_W, homePosition } = require('./lumi-window');
 
+let activeTimer = null;
+
 function animateTo(win, targetX, durationMs, done) {
+  if (activeTimer) {
+    clearInterval(activeTimer);
+    activeTimer = null;
+  }
   const [startX, y] = win.getPosition();
   const steps = Math.max(1, Math.round(durationMs / 16));
   let i = 0;
-  const timer = setInterval(() => {
+  activeTimer = setInterval(() => {
     i += 1;
     if (win.isDestroyed()) {
-      clearInterval(timer);
+      clearInterval(activeTimer);
+      activeTimer = null;
       return;
     }
     const x = Math.round(startX + (targetX - startX) * (i / steps));
     win.setPosition(x, y);
     if (i >= steps) {
-      clearInterval(timer);
+      clearInterval(activeTimer);
+      activeTimer = null;
       if (done) done();
     }
   }, 16);
@@ -28,6 +36,7 @@ function walkToCenter(win, message, tipo) {
   win.webContents.send('lumi-state', { state: 'walking' });
   animateTo(win, targetX, 1800, () => {
     if (win.isDestroyed()) return;
+    win.setIgnoreMouseEvents(false); // pina interativo só quando o convite aparece
     win.webContents.send('lumi-state', { state: 'invite', message, tipo });
   });
 }

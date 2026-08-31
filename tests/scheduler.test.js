@@ -59,13 +59,24 @@ describe('Scheduler', () => {
     expect(runTicks(s, { count: 1, startMs: 1091 * TICK }).length).toBe(1);
   });
 
-  it('adiar (snooze) segura o disparo ate expirar', () => {
+  it('adiar (snooze) apos um disparo reagenda para ~10 min, nao para o intervalo cheio', () => {
     const s = new Scheduler({ intervalMinutes: 50 });
-    runTicks(s, { count: 599 });
-    s.snooze(599 * TICK, 10); // adia 10 min
-    expect(runTicks(s, { count: 100, startMs: 599 * TICK })).toEqual([]);
-    const after = s.tick(599 * TICK + 11 * MIN, 0, TICK);
-    expect(after).toBe('intervention-due');
+    expect(runTicks(s, { count: 600 }).length).toBe(1); // dispara aos 50 min
+    s.snooze(600 * TICK, 10);
+    const fires = runTicks(s, { count: 240, startMs: 600 * TICK }); // +20 min
+    expect(fires.length).toBe(1);
+    expect(fires[0]).toBeGreaterThanOrEqual(600 * TICK + 10 * MIN);
+    expect(fires[0]).toBeLessThanOrEqual(600 * TICK + 10 * MIN + 2 * TICK);
+  });
+
+  it('voltar ao normal (silence 0) cancela o silencio sem aplicar folga', () => {
+    const s = new Scheduler({ intervalMinutes: 50 });
+    s.silence(0, 60);
+    runTicks(s, { count: 100 });          // ~8 min silenciado
+    s.silence(100 * TICK, 0);             // cancela
+    const fires = runTicks(s, { count: 500, startMs: 100 * TICK });
+    expect(fires.length).toBe(1);
+    expect(fires[0]).toBe(600 * TICK);
   });
 
   it('silenciar (em atendimento) segura o disparo e da folga de 5 min ao expirar', () => {

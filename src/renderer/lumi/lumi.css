@@ -14,11 +14,13 @@ html, body {
   cursor: pointer;
   pointer-events: none;
   will-change: transform;
-  transform-origin: 50% 82%;
+  transform-origin: 50% 91%;
   animation: breathe 4.5s ease-in-out infinite;
 }
 #lumi svg { display: block; }
 #lumi svg * { pointer-events: visiblePainted; }
+#lumi svg .aura,
+#lumi svg .sparkles { pointer-events: none; }
 
 @keyframes breathe {
   0%, 100% { transform: scale(1); }
@@ -38,7 +40,7 @@ html, body {
 }
 
 /* Chama e brilhos reagem ao hover */
-.flame { transform-origin: 100px 40px; }
+.flame { transform-origin: 100px 58px; }
 #lumi:hover .flame {
   animation: flicker 0.7s ease-in-out infinite;
 }

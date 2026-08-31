@@ -56,10 +56,12 @@ class Scheduler {
 
   snooze(nowMs, minutes) {
     this.snoozedUntil = nowMs + minutes * 60_000;
+    // "Adiar" mantém a intervenção devida; só a represa até expirar
+    this.activeMs = this.intervalMs;
   }
 
   silence(nowMs, minutes) {
-    this.silencedUntil = nowMs + minutes * 60_000;
+    this.silencedUntil = minutes > 0 ? nowMs + minutes * 60_000 : 0;
   }
 }
 

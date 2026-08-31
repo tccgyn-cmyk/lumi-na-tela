@@ -38,9 +38,6 @@ function pick(list) {
 function triggerIntervention() {
   if (currentTipo || !lumiAlive()) return;
   currentTipo = rotation.next();
-  // Durante o convite a janela fica interativa de forma determinística —
-  // nenhum clique no balão pode vazar pra aplicação de trás.
-  lumiWin.setIgnoreMouseEvents(false);
   walkToCenter(lumiWin, pick(convites[currentTipo]), currentTipo);
   inviteTimeout = setTimeout(() => handleResponse('timeout'), INVITE_TIMEOUT_MS);
 }
@@ -102,7 +99,10 @@ if (!gotLock) {
             label: 'Em atendimento',
             submenu: [30, 60, 120].map((min) => ({
               label: `${min} minutos`,
-              click: () => scheduler.silence(Date.now(), min),
+              click: () => {
+                scheduler.silence(Date.now(), min);
+                handleResponse('dismiss');
+              },
             })),
           },
           { label: 'Voltar ao normal', click: () => scheduler.silence(Date.now(), 0) },

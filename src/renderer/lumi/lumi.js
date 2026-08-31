@@ -47,6 +47,7 @@ lumiEl.addEventListener('contextmenu', (e) => {
 
 // Estados vindos do processo principal
 window.lumiAPI.onState((s) => {
+  ignoring = null; // main pinou/despinou por fora; força o próximo envio
   if (s.state) lumiEl.dataset.state = s.state;
   if (s.state === 'invite') {
     bubbleText.textContent = s.message || '';
@@ -61,3 +62,9 @@ window.lumiAPI.onState((s) => {
 document.getElementById('btn-accept').addEventListener('click', () => window.lumiAPI.respond('accept'));
 document.getElementById('btn-snooze').addEventListener('click', () => window.lumiAPI.respond('snooze'));
 document.getElementById('btn-dismiss').addEventListener('click', () => window.lumiAPI.respond('dismiss'));
+
+// Janela pinada interativa durante o convite: clique fora do Lumi/balão dispensa
+document.addEventListener('mousedown', (e) => {
+  const inside = e.target instanceof Element && e.target.closest('#lumi, #bubble');
+  if (!inside && lumiEl.dataset.state === 'invite') window.lumiAPI.respond('dismiss');
+});
