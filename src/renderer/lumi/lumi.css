@@ -1,0 +1,95 @@
+html, body {
+  margin: 0;
+  background: transparent;
+  overflow: hidden;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  user-select: none;
+  height: 100%;
+}
+
+#lumi {
+  position: absolute;
+  bottom: 0;
+  right: 8px;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+
+/* Respiração calma constante */
+.body-group {
+  transform-origin: 100px 140px;
+  animation: breathe 4.5s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.035); }
+}
+
+/* Piscar de vez em quando */
+.eyes {
+  transform-origin: 100px 72px;
+  animation: blink 6s infinite;
+}
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.08); }
+}
+
+/* Guelras balançam no hover */
+#lumi:hover .gills {
+  animation: wiggle 0.6s ease-in-out infinite;
+}
+.gills-left { transform-origin: 76px 45px; }
+.gills-right { transform-origin: 124px 45px; }
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(8deg); }
+}
+
+/* Andando: balanço mais rápido */
+#lumi[data-state="walking"] .body-group {
+  animation: bob 0.4s ease-in-out infinite;
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Balão de fala */
+.bubble {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  right: 8px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px 12px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+  font-size: 13px;
+  color: #3a3a3a;
+}
+.bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  right: 60px;
+  border: 8px solid transparent;
+  border-top-color: #fff;
+  border-bottom: none;
+}
+.bubble p { margin: 0 0 8px; }
+.bubble-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.bubble-actions button {
+  border: none;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  background: #f0edff;
+  color: #3a3a3a;
+}
+.bubble-actions #btn-accept {
+  background: #ffb5c2;
+  font-weight: 600;
+}
+.hidden { display: none !important; }

@@ -39,9 +39,10 @@ function createLumiWindow() {
   if (process.platform === 'darwin') {
     win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: false });
   }
-  win.once('ready-to-show', () => win.show());
+  win.once('ready-to-show', () => win.showInactive());
   win.loadFile(path.join(__dirname, '../renderer/lumi/index.html')).catch((err) => {
     console.error('[lumi] falha ao carregar janela', err);
+    win.destroy();
   });
   win.setIgnoreMouseEvents(true, { forward: true });
 

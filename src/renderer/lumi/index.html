@@ -4,16 +4,43 @@
   <meta charset="UTF-8" />
   <title>Lumi</title>
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self'">
-  <style>
-    html, body { margin: 0; background: transparent; overflow: hidden; }
-    #placeholder {
-      position: absolute; bottom: 8px; right: 8px;
-      width: 80px; height: 64px; background: #ffb5c2;
-      border-radius: 24px 24px 16px 16px;
-    }
-  </style>
+  <link rel="stylesheet" href="lumi.css" />
 </head>
 <body>
-  <div id="placeholder"></div>
+  <div id="bubble" class="bubble hidden">
+    <p id="bubble-text"></p>
+    <div id="bubble-actions" class="bubble-actions hidden">
+      <button id="btn-accept">Bora! 💪</button>
+      <button id="btn-snooze">Daqui a 10 min</button>
+      <button id="btn-dismiss">Agora não</button>
+    </div>
+  </div>
+  <div id="lumi" data-state="idle">
+    <svg viewBox="0 0 200 170" width="150" height="128" xmlns="http://www.w3.org/2000/svg">
+      <g class="body-group">
+        <g class="gills gills-left">
+          <path d="M70 55 Q55 40 62 30 Q72 42 76 50 Z" fill="#ff8fa8" />
+          <path d="M78 45 Q70 25 80 18 Q86 34 88 44 Z" fill="#ff8fa8" />
+        </g>
+        <g class="gills gills-right">
+          <path d="M130 55 Q145 40 138 30 Q128 42 124 50 Z" fill="#ff8fa8" />
+          <path d="M122 45 Q130 25 120 18 Q114 34 112 44 Z" fill="#ff8fa8" />
+        </g>
+        <path class="tail" d="M140 110 Q165 105 160 90" stroke="#ffb5c2" stroke-width="12" fill="none" stroke-linecap="round" />
+        <ellipse cx="100" cy="110" rx="48" ry="34" fill="#ffb5c2" />
+        <circle cx="100" cy="75" r="34" fill="#ffc4cf" />
+        <g class="eyes">
+          <circle cx="88" cy="72" r="5" fill="#3a3a3a" />
+          <circle cx="112" cy="72" r="5" fill="#3a3a3a" />
+          <circle cx="90" cy="70" r="1.5" fill="#fff" />
+          <circle cx="114" cy="70" r="1.5" fill="#fff" />
+        </g>
+        <path class="mouth" d="M90 85 Q100 93 110 85" stroke="#3a3a3a" stroke-width="2.5" fill="none" stroke-linecap="round" />
+        <circle cx="74" cy="82" r="5" fill="#ff9db2" opacity="0.7" />
+        <circle cx="126" cy="82" r="5" fill="#ff9db2" opacity="0.7" />
+      </g>
+    </svg>
+  </div>
+  <script src="lumi.js"></script>
 </body>
 </html>
