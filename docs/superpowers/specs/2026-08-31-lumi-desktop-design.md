@@ -6,7 +6,7 @@
 
 ## 1. Visão geral
 
-Lumi é um app gratuito para desktop (Windows e Mac) com um personagem — um axolote fofinho — que mora num canto da tela enquanto profissionais de saúde trabalham no computador. Em intervalos inteligentes, o Lumi interrompe gentilmente para atividades de saúde mental: micro-pausas físicas, respiração guiada, check-in emocional e pílulas de psicoeducação.
+Lumi é um app gratuito para desktop (Windows e Mac) com um personagem — uma criaturinha de luz fofinha (chama/gota luminosa) vestindo um jaleco verde-água — que mora num canto da tela enquanto profissionais de saúde trabalham no computador. Em intervalos inteligentes, o Lumi interrompe gentilmente para atividades de saúde mental: micro-pausas físicas, respiração guiada, check-in emocional e pílulas de psicoeducação.
 
 **Papel no negócio:** produto de entrada gratuito do funil PsicoLabs. Captura e-mail no download (landing page, sub-projeto separado) e conduz naturalmente ao Método Arquitetura do Encontro Hospitalar (R$67), ConectaDig e livro.
 
@@ -16,7 +16,7 @@ Lumi é um app gratuito para desktop (Windows e Mac) com um personagem — um ax
 
 **Decisões-chave já tomadas:**
 - Plataforma: desktop primeiro (Windows + Mac). Mobile fica para sub-projeto futuro.
-- Personagem: axolote (símbolo de regeneração), carismático, estilo pet virtual.
+- Personagem (atualizado em 2026-08-31, imagem de referência do Roberto): criatura de luz — corpo creme luminoso em forma de chama/gota, olhos grandes azul-marinho, bochechas rosadas, jaleco/scrub verde-água com crachá de coração. A luz remete ao nome "Lumi" e o scrub ao público da saúde. Poses de referência: parado segurando um coração de luz, olhos fechados (respiração), acenando (convite), braços abertos (celebração). (Decisão anterior: axolote — substituído.)
 - Comportamento: **híbrido** — mora ancorado num canto (discreto); na hora da intervenção atravessa a tela e chama o usuário.
 - Tecnologia: **Electron** (janela transparente madura, um código para Win+Mac, desenvolvimento rápido; aceito o custo de ~90MB de download).
 - Funil: e-mail para baixar (landing page) + CTAs dentro do app + conteúdo assinado compartilhável.
