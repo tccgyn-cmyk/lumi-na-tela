@@ -9,6 +9,7 @@ describe('Conteúdo', () => {
       expect(m.titulo).toBeTruthy();
       expect(m.texto).toBeTruthy();
     }
+    expect(new Set(microPausas.map((m) => m.id)).size).toBe(microPausas.length);
   });
 
   it('tem 6 exercicios, cada um com titulo e passos ou respiracao', () => {

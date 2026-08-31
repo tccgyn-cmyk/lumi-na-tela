@@ -9,6 +9,12 @@ class Scheduler {
     this.intervalMs = mins * 60_000;
     this.idleThresholdMs = idleThresholdSeconds * 1000;
     this.idleResetMs = idleResetMinutes * 60_000;
+    if (this.idleResetMs <= this.idleThresholdMs) {
+      // Senão existe uma faixa de ociosidade que nem pausa nem zera o contador
+      throw new TypeError(
+        `idleResetMinutes (${idleResetMinutes}) deve ser maior que idleThresholdSeconds (${idleThresholdSeconds}) em minutos`
+      );
+    }
     this.activeMs = 0;
     this.snoozedUntil = 0;
     this.silencedUntil = 0;

@@ -30,6 +30,10 @@ describe('Scheduler', () => {
     expect(() => new Scheduler({ intervalMinutes: 'abc' })).toThrow(TypeError);
     expect(() => new Scheduler({ intervalMinutes: 0 })).toThrow(TypeError);
     expect(() => new Scheduler({ intervalMinutes: -5 })).toThrow(TypeError);
+    // Faixas de ociosidade incoerentes (reset <= pausa) também são rejeitadas
+    expect(
+      () => new Scheduler({ idleThresholdSeconds: 1200, idleResetMinutes: 15 })
+    ).toThrow(TypeError);
   });
 
   it('nao acumula tempo em ociosidade curta (pausa, nao reset)', () => {
