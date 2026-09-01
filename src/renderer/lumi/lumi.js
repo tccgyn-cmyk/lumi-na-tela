@@ -7,6 +7,7 @@ const spriteEl = document.getElementById('lumi-sprite');
 // Poses do personagem (imagens reais) por estado
 const SPRITES = {
   idle: 'img/idle.png',
+  blink: 'img/idle-piscar.png',
   walking: 'img/idle.png',
   waving: 'img/acena.png',
   invite: 'img/acena.png',
@@ -47,10 +48,24 @@ document.addEventListener('mouseout', (e) => {
 });
 window.addEventListener('blur', () => setIgnore(true));
 
-// Micro-gesto periódico (equivalente ao "piscar" da versão SVG):
-// de tempos em tempos o Lumi dá uma espremidinha simpática.
+// Piscar de verdade: alterna para o quadro de olhos fechados por um instante
+function scheduleBlink() {
+  const delay = 3500 + Math.random() * 3500;
+  setTimeout(() => {
+    if (lumiEl.dataset.state === 'idle') {
+      spriteEl.src = SPRITES.blink;
+      setTimeout(() => {
+        if (lumiEl.dataset.state === 'idle') spriteEl.src = SPRITES.idle;
+      }, 170);
+    }
+    scheduleBlink();
+  }, delay);
+}
+scheduleBlink();
+
+// Micro-gesto periódico: de tempos em tempos o Lumi dá uma espremidinha simpática
 function scheduleGesto() {
-  const delay = 4000 + Math.random() * 4000;
+  const delay = 9000 + Math.random() * 6000;
   setTimeout(() => {
     if (lumiEl.dataset.state === 'idle') {
       spriteEl.classList.add('gesto');
