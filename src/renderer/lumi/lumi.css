@@ -17,7 +17,11 @@ html, body {
   transform-origin: 50% 91%;
   animation: breathe 4.5s ease-in-out infinite;
 }
-#lumi svg { display: block; }
+#lumi svg {
+  display: block;
+  /* Sombra suave para o Lumi se destacar sobre fundos claros */
+  filter: drop-shadow(0 2px 5px rgba(90, 60, 0, 0.35));
+}
 #lumi svg * { pointer-events: visiblePainted; }
 #lumi svg .aura,
 #lumi svg .sparkles { pointer-events: none; }
