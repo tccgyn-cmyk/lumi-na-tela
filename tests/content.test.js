@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { microPausas, exercicios, convites } from '../src/shared/content.js';
+import { microPausas, exercicios, convites, falinhas } from '../src/shared/content.js';
 
 describe('Conteúdo', () => {
   it('tem pelo menos 10 micro-pausas com titulo e texto', () => {
@@ -28,6 +28,19 @@ describe('Conteúdo', () => {
   it('tem convites para cada tipo de atividade', () => {
     expect(convites['micro-pausa'].length).toBeGreaterThanOrEqual(3);
     expect(convites['respiracao'].length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('tem falinhas suficientes, com texto e periodos validos', () => {
+    expect(falinhas.length).toBeGreaterThanOrEqual(25);
+    const periodosValidos = ['manha', 'tarde', 'noite', undefined];
+    for (const f of falinhas) {
+      expect(f.texto).toBeTruthy();
+      expect(periodosValidos).toContain(f.periodo);
+    }
+    // Cada período do dia tem pelo menos 3 opções próprias
+    for (const p of ['manha', 'tarde', 'noite']) {
+      expect(falinhas.filter((f) => f.periodo === p).length).toBeGreaterThanOrEqual(3);
+    }
   });
 
   it('todo tipo do rodizio tem convites', () => {

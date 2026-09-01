@@ -88,4 +88,39 @@ const convites = {
   ],
 };
 
-module.exports = { microPausas, exercicios, convites };
+// Falinhas: conversa espontânea do Lumi (balão sem botões, some sozinho).
+// periodo: 'manha' | 'tarde' | 'noite' — sem periodo = vale a qualquer hora.
+const falinhas = [
+  { periodo: 'manha', texto: 'Bom dia! Bora cuidar de gente hoje? Eu cuido de você. 💛' },
+  { periodo: 'manha', texto: 'Chegou! Já tomou um café e respirou fundo? ☀️' },
+  { periodo: 'manha', texto: 'Dia novo, plantão novo. Tô contigo! ✨' },
+  { periodo: 'manha', texto: 'Bom dia! Lembra: você não precisa dar conta de tudo antes do almoço. 😄' },
+  { periodo: 'tarde', texto: 'Boa tarde! Metade do dia já foi — você tá indo showww. 👏' },
+  { periodo: 'tarde', texto: 'Aquela hora da tarde, né? Segura firme que eu tô aqui. ☕' },
+  { periodo: 'tarde', texto: 'Boa tarde! Já comeu direito hoje ou tá adiando? 👀' },
+  { periodo: 'tarde', texto: 'Reta final do dia chegando. Um passo de cada vez. 💪' },
+  { periodo: 'noite', texto: 'Boa noite! Quem trabalha a essa hora merece o dobro de carinho. 🌙' },
+  { periodo: 'noite', texto: 'Plantão noturno? Respira comigo que a madrugada passa. 🌟' },
+  { periodo: 'noite', texto: 'Fim de expediente chegando? Já pensa numa coisa boa pra fazer por você. 🌙' },
+  { texto: 'Você já bebeu água ou tá vivendo de café? ☕😄' },
+  { texto: 'Ombros relaxados? Mandíbula solta? Só conferindo. 👀' },
+  { texto: 'Quem cuida de você enquanto você cuida de todo mundo? Eu! 💛' },
+  { texto: 'Showww, mais um dia ajudando gente. Isso não é pouco.' },
+  { texto: 'Pisca duas vezes se você esqueceu de almoçar. 😅' },
+  { texto: 'Sabia que pausas curtas melhoram até a memória? Ciência, viu?' },
+  { texto: 'Seu paciente sente quando você tá bem. Cuidar de você também é técnica.' },
+  { texto: 'Alonga esse pescoço rapidinho. Confia. 🙆' },
+  { texto: 'Tá tudo bem não estar 100% o tempo todo. Ninguém tá.' },
+  { texto: 'Respirar fundo 3 vezes já muda o corpo. Quando quiser, me chama.' },
+  { texto: 'Postura de super-herói: pés no chão, coluna reta. Testa aí. 🦸' },
+  { texto: 'Você é o profissional que muita gente esperou a vida toda encontrar.' },
+  { texto: 'Momento gratidão: pensa numa coisa boa de hoje. Achou? Showww.' },
+  { texto: 'Olha pra longe por 20 segundos. Seus olhos agradecem. 🪟' },
+  { texto: 'Se hoje tá pesado, lembra: você já atravessou 100% dos seus dias difíceis.' },
+  { texto: 'Hidratação não é frescura, é protocolo. 💧' },
+  { texto: 'Eu vi você aí, focado. Orgulho define. 💪' },
+  { texto: 'Um plantão de cada vez. Uma pausa de cada vez.' },
+  { texto: 'Café é combustível, mas pausa é manutenção. ⛽' },
+];
+
+module.exports = { microPausas, exercicios, convites, falinhas };

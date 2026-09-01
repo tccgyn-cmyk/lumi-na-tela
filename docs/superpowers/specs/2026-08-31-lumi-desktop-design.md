@@ -33,7 +33,7 @@ Lumi é um app gratuito para desktop (Windows e Mac) com um personagem — uma c
 - Zero interrupção fora dos momentos de intervenção.
 
 ### 2.3 Intervenções
-- Gatilho padrão: a cada **50 minutos de uso ativo contínuo** do computador (configurável: 30/50/60/90 min). Tempo ocioso curto (5-15 min, ex.: reunião rápida) pausa o contador; ocioso longo (15+ min, ex.: almoço) **zera** o contador — a pessoa acabou de descansar, não faz sentido pedir pausa logo ao voltar.
+- Gatilho: a cada **N minutos de uso ativo contínuo** (30/50/60/90). Padrão 50; **no onboarding o usuário escolhe o próprio ritmo** ("quantas pausas você quer por dia?") — decisão de 2026-09-01. Enquanto o onboarding não existe, o ajuste fica no menu de contexto ("Ritmo das pausas"). Tempo ocioso curto (5-15 min, ex.: reunião rápida) pausa o contador; ocioso longo (15+ min, ex.: almoço) **zera** o contador — a pessoa acabou de descansar, não faz sentido pedir pausa logo ao voltar.
 - Ao expirar o modo "Em atendimento", o Lumi espera uma folga de ~5 minutos antes de intervir (nunca "pula" na pessoa no segundo em que o silêncio acaba).
 - Momento da intervenção: o Lumi acorda, atravessa a tela nadando, e chama o usuário com um balão. O usuário pode aceitar, adiar ("daqui a 10 min") ou dispensar.
 - Rodízio equilibrado entre 4 tipos:
@@ -50,6 +50,18 @@ Lumi é um app gratuito para desktop (Windows e Mac) com um personagem — uma c
 ### 2.5 Vínculo e recompensa
 - Sequências ("3 dias seguidos cuidando de você, showww!") com celebração do Lumi.
 - Painel semanal: pausas feitas, humor registrado, sequência atual.
+- **Falinhas** (decisão de 2026-09-01): balões de conversa espontânea, sem botões, que somem sozinhos em ~8s. Frequência "companheiro": ~1 por hora (intervalo aleatório de 45-75 min), nunca durante silêncio/convite/atividade nem a menos de 5 min de um convite, e só com a pessoa ativa no computador. Conteúdo por período do dia (manhã/tarde/noite) + frases gerais no tom da marca, revisadas pelo Roberto; atualizáveis remotamente na Fase 4.
+
+### 2.5b Duração-alvo de cada ação (decisão de 2026-09-01)
+| Ação | Duração-alvo |
+|---|---|
+| Micro-pausa física | 30-60 s |
+| Respiração/regulação | 1-3 min |
+| Check-in emocional (fase 3) | ~15 s |
+| Pílula de psicoeducação (fase 3) | 20-30 s |
+| Falinha | 8 s (passiva) |
+
+Meta: em um expediente de 8h, todos os encontros com o Lumi somam **menos de ~12 minutos** (≈2% do expediente) — argumento central de venda.
 
 ### 2.6 Funil (dentro do app)
 - CTAs contextuais: no máximo **1 a cada 2-3 dias**, em tom natural do Lumi, apontando para Método (R$67), ConectaDig, livro (R$37) ou Instagram @robertoribeiropsi.

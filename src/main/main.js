@@ -4,7 +4,7 @@ const { openActivity } = require('./activity-window');
 const { Scheduler } = require('./scheduler');
 const { Rotation } = require('./rotation');
 const { walkToCenter, returnHome } = require('./intervention');
-const { convites } = require('../shared/content');
+const { convites, falinhas } = require('../shared/content');
 
 const TICK_MS = 5000;
 const INVITE_TIMEOUT_MS = 2 * 60_000;
@@ -35,6 +35,41 @@ const rotation = new Rotation(['micro-pausa', 'respiracao']);
 let currentTipo = null;
 let inviteTimeout = null;
 let waving = false;
+let intervaloAtual = resolveIntervalMinutes(); // minutos (ajustável no menu)
+
+// Falinhas: conversa espontânea ~1x/hora (45-75 min), fora de convites.
+// LUMI_DEV_FALINHA=20 → primeira em 20s e a cada ~60s (para testar).
+const DEV_FALINHA_S = Number(process.env.LUMI_DEV_FALINHA) > 0
+  ? Number(process.env.LUMI_DEV_FALINHA)
+  : 0;
+const FALINHA_DURATION_MS = 8000;
+let nextFalinhaAt = Date.now() + (DEV_FALINHA_S
+  ? DEV_FALINHA_S * 1000
+  : (5 + Math.random() * 5) * 60_000); // primeira: 5-10 min após abrir
+let ultimaFalinha = null;
+
+function agendaProximaFalinha() {
+  nextFalinhaAt = Date.now() + (DEV_FALINHA_S
+    ? 60_000
+    : (45 + Math.random() * 30) * 60_000);
+}
+
+function periodoDoDia() {
+  const h = new Date().getHours();
+  if (h < 12) return 'manha';
+  if (h < 18) return 'tarde';
+  return 'noite';
+}
+
+function pickFalinha() {
+  const periodo = periodoDoDia();
+  const opcoes = falinhas.filter(
+    (f) => (!f.periodo || f.periodo === periodo) && f.texto !== ultimaFalinha
+  );
+  const escolhida = pick(opcoes.length ? opcoes : falinhas);
+  ultimaFalinha = escolhida.texto;
+  return escolhida.texto;
+}
 // Enquanto o Lumi está atravessando a tela (1,8s), o estado final da
 // travessia ("idle") chega atrasado e engoliria um aceno enviado no meio.
 let walkUntil = 0;
@@ -59,6 +94,24 @@ function updateAttentionWave(idleSeconds) {
       state: shouldWave ? 'waving' : 'idle',
     });
   }
+}
+
+function maybeFalinha(idleSeconds) {
+  if (!lumiAlive() || currentTipo || waving) return;
+  if (activityWin && !activityWin.isDestroyed()) return;
+  const now = Date.now();
+  if (now < walkUntil || now < nextFalinhaAt) return;
+  if (idleSeconds > 45) return; // só com a pessoa ali, ativa
+  if (now < scheduler.silencedUntil) return; // em atendimento: silêncio total
+  // Não puxa papo se um convite está a menos de 5 min de acontecer
+  if (scheduler.intervalMs - scheduler.activeMs < 5 * 60_000) return;
+  agendaProximaFalinha();
+  lumiWin.webContents.send('lumi-state', { state: 'talking', message: pickFalinha() });
+  setTimeout(() => {
+    if (!currentTipo && lumiAlive()) {
+      lumiWin.webContents.send('lumi-state', { state: 'idle' });
+    }
+  }, FALINHA_DURATION_MS);
 }
 
 function triggerIntervention() {
@@ -136,6 +189,18 @@ if (!gotLock) {
           { label: 'Pausar agora', click: () => triggerIntervention() },
           { type: 'separator' },
           {
+            label: 'Ritmo das pausas',
+            submenu: [30, 50, 60, 90].map((min) => ({
+              label: `A cada ${min} minutos`,
+              type: 'radio',
+              checked: intervaloAtual === min,
+              click: () => {
+                intervaloAtual = min;
+                scheduler.setIntervalMinutes(min);
+              },
+            })),
+          },
+          {
             label: 'Em atendimento',
             submenu: [30, 60, 120].map((min) => ({
               label: `${min} minutos`,
@@ -157,6 +222,7 @@ if (!gotLock) {
         const due = scheduler.tick(Date.now(), idleSeconds, TICK_MS);
         if (due) triggerIntervention();
         updateAttentionWave(idleSeconds);
+        maybeFalinha(idleSeconds);
       }, TICK_MS);
     })
     .catch((err) => {

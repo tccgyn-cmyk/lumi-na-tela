@@ -103,6 +103,16 @@ describe('Scheduler', () => {
     expect(fires[0]).toBeLessThanOrEqual(60 * MIN + 5 * MIN + 2 * TICK);
   });
 
+  it('permite mudar o ritmo em tempo de execucao', () => {
+    const s = new Scheduler({ intervalMinutes: 50 });
+    runTicks(s, { count: 360 }); // 30 min ativos
+    s.setIntervalMinutes(30);    // usuário escolheu ritmo mais curto
+    const fires = runTicks(s, { count: 12, startMs: 360 * TICK }); // +1 min
+    expect(fires.length).toBe(1); // 30 min acumulados >= novo intervalo de 30
+    expect(() => s.setIntervalMinutes('abc')).toThrow(TypeError);
+    expect(() => s.setIntervalMinutes(0)).toThrow(TypeError);
+  });
+
   it('reseta o contador apos disparar', () => {
     const s = new Scheduler({ intervalMinutes: 50 });
     runTicks(s, { count: 600 }); // dispara

@@ -54,6 +54,14 @@ class Scheduler {
     return null;
   }
 
+  setIntervalMinutes(minutes) {
+    const mins = Number(minutes);
+    if (!Number.isFinite(mins) || mins <= 0) {
+      throw new TypeError(`intervalMinutes inválido: ${minutes}`);
+    }
+    this.intervalMs = mins * 60_000;
+  }
+
   snooze(nowMs, minutes) {
     this.snoozedUntil = nowMs + minutes * 60_000;
     // "Adiar" mantém a intervenção devida; só a represa até expirar

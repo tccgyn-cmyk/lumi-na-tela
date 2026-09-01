@@ -8,6 +8,7 @@ const spriteEl = document.getElementById('lumi-sprite');
 const SPRITES = {
   idle: 'img/idle.png',
   blink: 'img/idle-piscar.png',
+  talking: 'img/idle.png',
   walking: 'img/idle.png',
   waving: 'img/acena.png',
   invite: 'img/acena.png',
@@ -90,6 +91,11 @@ window.lumiAPI.onState((s) => {
     bubbleText.textContent = s.message || '';
     bubble.classList.remove('hidden');
     bubbleActions.classList.remove('hidden');
+  } else if (s.state === 'talking') {
+    // Falinha: balão sem botões, o main esconde sozinho depois de uns segundos
+    bubbleText.textContent = s.message || '';
+    bubble.classList.remove('hidden');
+    bubbleActions.classList.add('hidden');
   } else {
     bubble.classList.add('hidden');
     bubbleActions.classList.add('hidden');

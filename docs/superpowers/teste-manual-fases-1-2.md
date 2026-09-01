@@ -11,6 +11,8 @@ $env:LUMI_DEV_INTERVAL='1'; npm start
 - [ ] Respira suavemente e pisca de tempos em tempos
 - [ ] Passar o mouse por cima faz a chama tremeluzir e os brilhos piscarem
 - [ ] Ficar 1+ min sem mexer no mouse/teclado: o Lumi começa a acenar com os bracinhos; ao voltar a mexer, ele para
+- [ ] Falinha: com `$env:LUMI_DEV_FALINHA='15'`, um balão de conversa (sem botões) aparece após ~15s e some sozinho em ~8s
+- [ ] Menu "Ritmo das pausas" muda o intervalo dos convites (testar 30 vs 90)
 - [ ] Cliques FORA do Lumi passam para a janela de trás — testar clicando num texto atrás dele, inclusive nos cantos vazios do retângulo dele (a aura não pode "comer" cliques)
 - [ ] Clique direito no Lumi abre o menu (Pausar agora / Em atendimento / Voltar ao normal / Sair)
 
