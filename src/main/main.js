@@ -8,6 +8,10 @@ const { convites } = require('../shared/content');
 
 const TICK_MS = 5000;
 const INVITE_TIMEOUT_MS = 2 * 60_000;
+// Sem interação entre 1 e 15 min: o Lumi acena para chamar atenção.
+// Acima de 15 min a pessoa saiu de verdade — não adianta acenar.
+const WAVE_MIN_IDLE_S = 60;
+const WAVE_MAX_IDLE_S = 15 * 60;
 
 // LUMI_DEV_INTERVAL=1 npm start → intervalo de 1 min para testar.
 // Valor inválido cai no padrão (o Scheduler rejeita, então validamos aqui).
@@ -28,6 +32,7 @@ const scheduler = new Scheduler({ intervalMinutes: resolveIntervalMinutes() });
 const rotation = new Rotation(['micro-pausa', 'respiracao']);
 let currentTipo = null;
 let inviteTimeout = null;
+let waving = false;
 
 function lumiAlive() {
   return lumiWin && !lumiWin.isDestroyed();
@@ -37,10 +42,23 @@ function pick(list) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
+function updateAttentionWave(idleSeconds) {
+  if (!lumiAlive() || currentTipo) return;
+  const shouldWave =
+    idleSeconds >= WAVE_MIN_IDLE_S && idleSeconds < WAVE_MAX_IDLE_S;
+  if (shouldWave !== waving) {
+    waving = shouldWave;
+    lumiWin.webContents.send('lumi-state', {
+      state: shouldWave ? 'waving' : 'idle',
+    });
+  }
+}
+
 function triggerIntervention() {
   if (currentTipo || !lumiAlive()) return;
   if (activityWin && !activityWin.isDestroyed()) return; // atividade em andamento
   currentTipo = rotation.next();
+  waving = false; // a travessia substitui o aceno; o tick seguinte reavalia
   walkToCenter(lumiWin, pick(convites[currentTipo]), currentTipo);
   inviteTimeout = setTimeout(() => handleResponse('timeout'), INVITE_TIMEOUT_MS);
 }
@@ -125,12 +143,10 @@ if (!gotLock) {
       });
 
       setInterval(() => {
-        const due = scheduler.tick(
-          Date.now(),
-          powerMonitor.getSystemIdleTime(),
-          TICK_MS
-        );
+        const idleSeconds = powerMonitor.getSystemIdleTime();
+        const due = scheduler.tick(Date.now(), idleSeconds, TICK_MS);
         if (due) triggerIntervention();
+        updateAttentionWave(idleSeconds);
       }, TICK_MS);
     })
     .catch((err) => {

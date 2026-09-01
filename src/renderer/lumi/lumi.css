@@ -69,6 +69,27 @@ html, body {
   50% { transform: translateY(-6px); }
 }
 
+/* Acenando: chama atenção quando a pessoa fica um tempo sem interagir */
+#lumi[data-state="waving"] {
+  animation: bob 0.5s ease-in-out infinite;
+}
+#lumi[data-state="waving"] .braco-esq {
+  animation: wave-esq 0.7s ease-in-out infinite;
+  transform-origin: 76px 112px;
+}
+#lumi[data-state="waving"] .braco-dir {
+  animation: wave-dir 0.7s ease-in-out infinite;
+  transform-origin: 124px 112px;
+}
+@keyframes wave-esq {
+  0%, 100% { transform: rotate(30deg); }
+  50% { transform: rotate(-40deg); }
+}
+@keyframes wave-dir {
+  0%, 100% { transform: rotate(-30deg); }
+  50% { transform: rotate(40deg); }
+}
+
 /* Balão de fala */
 .bubble {
   position: absolute;
