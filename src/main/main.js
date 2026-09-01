@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, Menu, powerMonitor } = require('electron');
 const { createLumiWindow } = require('./lumi-window');
+const { openActivity } = require('./activity-window');
 const { Scheduler } = require('./scheduler');
 const { Rotation } = require('./rotation');
 const { walkToCenter, returnHome } = require('./intervention');
@@ -22,6 +23,7 @@ function resolveIntervalMinutes() {
 }
 
 let lumiWin = null;
+let activityWin = null;
 const scheduler = new Scheduler({ intervalMinutes: resolveIntervalMinutes() });
 const rotation = new Rotation(['micro-pausa', 'respiracao']);
 let currentTipo = null;
@@ -56,8 +58,11 @@ function handleResponse(answer) {
     scheduler.snooze(Date.now(), 10);
   }
   if (answer === 'accept') {
-    // Na Task 9 isto abre o cartão de atividade. Por enquanto, log:
-    console.log(`[lumi] atividade aceita: ${tipo}`);
+    if (activityWin && !activityWin.isDestroyed()) activityWin.close();
+    activityWin = openActivity(tipo);
+    activityWin.on('closed', () => {
+      activityWin = null;
+    });
   }
 }
 
@@ -87,6 +92,11 @@ if (!gotLock) {
         const win = BrowserWindow.fromWebContents(e.sender);
         if (!win || win !== lumiWin || win.isDestroyed()) return;
         handleResponse(answer);
+      });
+
+      ipcMain.on('activity-done', (e) => {
+        const win = BrowserWindow.fromWebContents(e.sender);
+        if (win && win === activityWin && !win.isDestroyed()) win.close();
       });
 
       ipcMain.on('lumi-menu', (e) => {
