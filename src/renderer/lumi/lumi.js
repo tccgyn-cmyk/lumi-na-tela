@@ -2,7 +2,28 @@ const lumiEl = document.getElementById('lumi');
 const bubble = document.getElementById('bubble');
 const bubbleText = document.getElementById('bubble-text');
 const bubbleActions = document.getElementById('bubble-actions');
-const eyesEl = document.querySelector('.eyes');
+const spriteEl = document.getElementById('lumi-sprite');
+
+// Poses do personagem (imagens reais) por estado
+const SPRITES = {
+  idle: 'img/idle.png',
+  walking: 'img/idle.png',
+  waving: 'img/acena.png',
+  invite: 'img/acena.png',
+  breathing: 'img/respira.png',
+  celebrate: 'img/comemora.png',
+};
+
+// Pré-carrega as poses para a troca ser instantânea
+for (const src of new Set(Object.values(SPRITES))) {
+  const im = new Image();
+  im.src = src;
+}
+
+function setPose(state) {
+  lumiEl.dataset.state = state;
+  spriteEl.src = SPRITES[state] || SPRITES.idle;
+}
 
 // Click-through dinâmico: só captura o mouse sobre o Lumi ou o balão.
 // Envia IPC apenas quando o estado muda (evita tempestade de mensagens).
@@ -26,19 +47,6 @@ document.addEventListener('mouseout', (e) => {
 });
 window.addEventListener('blur', () => setIgnore(true));
 
-// Piscar controlado por JS: evita manter uma animação CSS infinita rodando sempre.
-function scheduleBlink() {
-  const delay = 4000 + Math.random() * 3000;
-  setTimeout(() => {
-    if (eyesEl) {
-      eyesEl.classList.add('blinking');
-      setTimeout(() => eyesEl.classList.remove('blinking'), 200);
-    }
-    scheduleBlink();
-  }, delay);
-}
-scheduleBlink();
-
 // Menu de contexto no clique direito do Lumi
 lumiEl.addEventListener('contextmenu', (e) => {
   e.preventDefault();
@@ -48,7 +56,7 @@ lumiEl.addEventListener('contextmenu', (e) => {
 // Estados vindos do processo principal
 window.lumiAPI.onState((s) => {
   ignoring = null; // main pinou/despinou por fora; força o próximo envio
-  if (s.state) lumiEl.dataset.state = s.state;
+  if (s.state) setPose(s.state);
   if (s.state === 'invite') {
     bubbleText.textContent = s.message || '';
     bubble.classList.remove('hidden');

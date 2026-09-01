@@ -17,47 +17,25 @@ html, body {
   transform-origin: 50% 91%;
   animation: breathe 4.5s ease-in-out infinite;
 }
-#lumi svg {
+#lumi img {
   display: block;
+  height: 140px;
+  width: auto;
+  pointer-events: auto;
   /* Sombra suave para o Lumi se destacar sobre fundos claros */
-  filter: drop-shadow(0 2px 5px rgba(90, 60, 0, 0.35));
+  filter: drop-shadow(0 2px 5px rgba(90, 60, 0, 0.3));
+  transition: transform 0.2s ease-in-out;
 }
-#lumi svg * { pointer-events: visiblePainted; }
-#lumi svg .aura,
-#lumi svg .sparkles { pointer-events: none; }
 
 @keyframes breathe {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.035); }
 }
 
-/* Piscar sob comando do JS (evita animação infinita rodando sempre) */
-.eyes {
-  transform-origin: 100px 74px;
-}
-.eyes.blinking {
-  animation: blink-once 0.18s ease-in-out;
-}
-@keyframes blink-once {
-  0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(0.08); }
-}
-
-/* Chama e brilhos reagem ao hover */
-.flame { transform-origin: 100px 58px; }
-#lumi:hover .flame {
-  animation: flicker 0.7s ease-in-out infinite;
-}
-@keyframes flicker {
-  0%, 100% { transform: scaleY(1) scaleX(1); }
-  50% { transform: scaleY(1.18) scaleX(0.92); }
-}
-#lumi:hover .sparkles {
-  animation: twinkle 0.9s ease-in-out infinite;
-}
-@keyframes twinkle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.25; }
+/* Hover: o Lumi "acende" e dá uma crescidinha */
+#lumi:hover img {
+  transform: scale(1.05);
+  filter: drop-shadow(0 2px 10px rgba(255, 205, 80, 0.75)) brightness(1.06);
 }
 
 /* Andando: balanço mais rápido */
@@ -69,25 +47,9 @@ html, body {
   50% { transform: translateY(-6px); }
 }
 
-/* Acenando: chama atenção quando a pessoa fica um tempo sem interagir */
+/* Acenando: pose de aceno + balanço para chamar atenção */
 #lumi[data-state="waving"] {
   animation: bob 0.5s ease-in-out infinite;
-}
-#lumi[data-state="waving"] .braco-esq {
-  animation: wave-esq 0.7s ease-in-out infinite;
-  transform-origin: 76px 112px;
-}
-#lumi[data-state="waving"] .braco-dir {
-  animation: wave-dir 0.7s ease-in-out infinite;
-  transform-origin: 124px 112px;
-}
-@keyframes wave-esq {
-  0%, 100% { transform: rotate(30deg); }
-  50% { transform: rotate(-40deg); }
-}
-@keyframes wave-dir {
-  0%, 100% { transform: rotate(-30deg); }
-  50% { transform: rotate(40deg); }
 }
 
 /* Balão de fala */
