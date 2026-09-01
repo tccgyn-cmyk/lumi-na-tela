@@ -47,6 +47,20 @@ document.addEventListener('mouseout', (e) => {
 });
 window.addEventListener('blur', () => setIgnore(true));
 
+// Micro-gesto periódico (equivalente ao "piscar" da versão SVG):
+// de tempos em tempos o Lumi dá uma espremidinha simpática.
+function scheduleGesto() {
+  const delay = 4000 + Math.random() * 4000;
+  setTimeout(() => {
+    if (lumiEl.dataset.state === 'idle') {
+      spriteEl.classList.add('gesto');
+      setTimeout(() => spriteEl.classList.remove('gesto'), 320);
+    }
+    scheduleGesto();
+  }, delay);
+}
+scheduleGesto();
+
 // Menu de contexto no clique direito do Lumi
 lumiEl.addEventListener('contextmenu', (e) => {
   e.preventDefault();
