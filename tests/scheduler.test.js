@@ -79,6 +79,18 @@ describe('Scheduler', () => {
     expect(fires[0]).toBe(600 * TICK);
   });
 
+  it('voltar ao normal apos silencio longo mantem a folga de 5 min', () => {
+    const s = new Scheduler({ intervalMinutes: 50 });
+    s.silence(0, 120);
+    const during = runTicks(s, { count: 720 }); // 60 min trabalhando silenciado
+    expect(during).toEqual([]);
+    s.silence(720 * TICK, 0); // cancela manualmente
+    const fires = runTicks(s, { count: 120, startMs: 720 * TICK }); // +10 min
+    expect(fires.length).toBe(1);
+    expect(fires[0]).toBeGreaterThanOrEqual(720 * TICK + 5 * MIN);
+    expect(fires[0]).toBeLessThanOrEqual(720 * TICK + 5 * MIN + 2 * TICK);
+  });
+
   it('silenciar (em atendimento) segura o disparo e da folga de 5 min ao expirar', () => {
     const s = new Scheduler({ intervalMinutes: 50 });
     s.silence(0, 60);

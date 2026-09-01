@@ -61,7 +61,19 @@ class Scheduler {
   }
 
   silence(nowMs, minutes) {
-    this.silencedUntil = minutes > 0 ? nowMs + minutes * 60_000 : 0;
+    if (minutes > 0) {
+      this.silencedUntil = nowMs + minutes * 60_000;
+      return;
+    }
+    if (this.silencedUntil > nowMs) {
+      // Cancelamento manual de um silêncio ativo: mantém a folga de 5 min,
+      // como na expiração natural
+      this.activeMs = Math.min(
+        this.activeMs,
+        Math.max(0, this.intervalMs - GRACE_AFTER_SILENCE_MS)
+      );
+    }
+    this.silencedUntil = 0;
   }
 }
 
