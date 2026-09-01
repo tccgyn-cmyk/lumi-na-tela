@@ -39,6 +39,7 @@ function pick(list) {
 
 function triggerIntervention() {
   if (currentTipo || !lumiAlive()) return;
+  if (activityWin && !activityWin.isDestroyed()) return; // atividade em andamento
   currentTipo = rotation.next();
   walkToCenter(lumiWin, pick(convites[currentTipo]), currentTipo);
   inviteTimeout = setTimeout(() => handleResponse('timeout'), INVITE_TIMEOUT_MS);
@@ -59,9 +60,10 @@ function handleResponse(answer) {
   }
   if (answer === 'accept') {
     if (activityWin && !activityWin.isDestroyed()) activityWin.close();
-    activityWin = openActivity(tipo);
-    activityWin.on('closed', () => {
-      activityWin = null;
+    const win = openActivity(tipo);
+    activityWin = win;
+    win.on('closed', () => {
+      if (activityWin === win) activityWin = null;
     });
   }
 }
@@ -96,7 +98,7 @@ if (!gotLock) {
 
       ipcMain.on('activity-done', (e) => {
         const win = BrowserWindow.fromWebContents(e.sender);
-        if (win && win === activityWin && !win.isDestroyed()) win.close();
+        if (win && !win.isDestroyed() && win !== lumiWin) win.close();
       });
 
       ipcMain.on('lumi-menu', (e) => {

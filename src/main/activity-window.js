@@ -6,11 +6,16 @@ function pick(list) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
+const lastIds = {};
+
 function pickContent(tipo) {
-  if (tipo === 'micro-pausa') {
-    return { tipo, ...pick(microPausas) };
+  const list = tipo === 'micro-pausa' ? microPausas : exercicios;
+  let item = pick(list);
+  if (list.length > 1 && item.id === lastIds[tipo]) {
+    item = pick(list);
   }
-  return { tipo, ...pick(exercicios) };
+  lastIds[tipo] = item.id;
+  return { tipo, ...item };
 }
 
 function openActivity(tipo) {
@@ -22,6 +27,7 @@ function openActivity(tipo) {
     resizable: false,
     alwaysOnTop: true,
     skipTaskbar: true,
+    center: true,
     show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload-activity.js'),
@@ -30,16 +36,16 @@ function openActivity(tipo) {
       sandbox: true,
     },
   });
-  win.once('ready-to-show', () => win.show());
+  win.webContents.once('did-finish-load', () => {
+    win.webContents.send('activity-data', item);
+    win.show();
+  });
   win
     .loadFile(path.join(__dirname, '../renderer/activity/index.html'))
     .catch((err) => {
       console.error('[lumi] falha ao carregar cartão de atividade', err);
       win.destroy();
     });
-  win.webContents.on('did-finish-load', () => {
-    win.webContents.send('activity-data', item);
-  });
   return win;
 }
 

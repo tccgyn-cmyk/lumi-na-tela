@@ -19,6 +19,7 @@ window.activityAPI.onData((item) => {
     runBreath(item.respiracao);
   } else if (item.passos) {
     passosEl.classList.remove('hidden');
+    passosEl.textContent = '';
     for (const passo of item.passos) {
       const li = document.createElement('li');
       li.textContent = passo;
@@ -41,6 +42,7 @@ function runBreath(r) {
   function step() {
     if (ciclo >= r.ciclos) {
       breathLabel.textContent = 'Prontinho! Showww 💛';
+      circle.style.transitionDuration = '0.6s';
       circle.className = 'circle shrink';
       return;
     }
@@ -59,4 +61,8 @@ function runBreath(r) {
 
 document.getElementById('btn-done').addEventListener('click', () => {
   window.activityAPI.done();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') window.activityAPI.done();
 });
