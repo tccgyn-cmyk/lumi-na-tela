@@ -1,10 +1,13 @@
+const path = require('path');
 const { app, BrowserWindow, ipcMain, Menu, powerMonitor } = require('electron');
 const { createLumiWindow } = require('./lumi-window');
 const { openActivity } = require('./activity-window');
 const { Scheduler } = require('./scheduler');
 const { Rotation } = require('./rotation');
 const { walkToCenter, returnHome } = require('./intervention');
-const { convites, falinhas } = require('../shared/content');
+const { createStore } = require('./store');
+const { dentroDoExpediente } = require('./expediente');
+const { convites, falinhas, RODIZIO } = require('../shared/content');
 
 const TICK_MS = 5000;
 const INVITE_TIMEOUT_MS = 2 * 60_000;
@@ -28,14 +31,27 @@ function resolveIntervalMinutes() {
   return mins;
 }
 
+const store = createStore(path.join(app.getPath('userData'), 'lumi-dados.json'));
+let perfil = store.get('perfil', null);
+
+// Prioridade do ritmo: env de dev > perfil salvo > padrão 50
+function ritmoInicial() {
+  if (process.env.LUMI_DEV_INTERVAL) return resolveIntervalMinutes();
+  if (perfil && Number.isFinite(Number(perfil.ritmoMin)) && perfil.ritmoMin > 0) {
+    return perfil.ritmoMin;
+  }
+  return 50;
+}
+
 let lumiWin = null;
 let activityWin = null;
-const scheduler = new Scheduler({ intervalMinutes: resolveIntervalMinutes() });
-const rotation = new Rotation(['micro-pausa', 'respiracao']);
+let intervaloAtual = ritmoInicial(); // minutos (ajustável no menu)
+const scheduler = new Scheduler({ intervalMinutes: intervaloAtual });
+// Rodízio da fase 3 (canônico em content.js): pílula a cada 4 convites
+const rotation = new Rotation(RODIZIO, store.get('rotacaoIndex', 0));
 let currentTipo = null;
 let inviteTimeout = null;
 let waving = false;
-let intervaloAtual = resolveIntervalMinutes(); // minutos (ajustável no menu)
 
 // Falinhas: conversa espontânea ~1x/hora (45-75 min), fora de convites.
 // LUMI_DEV_FALINHA=20 → primeira em 20s e a cada ~60s (para testar).
@@ -85,8 +101,9 @@ function pick(list) {
 function updateAttentionWave(idleSeconds) {
   if (!lumiAlive() || currentTipo) return;
   if (Date.now() < walkUntil) return; // espera a travessia terminar
+  const foraDoExpediente = !dentroDoExpediente(Date.now(), perfil?.expediente);
   const shouldWave =
-    idleSeconds >= WAVE_MIN_IDLE_S && idleSeconds < WAVE_MAX_IDLE_S;
+    !foraDoExpediente && idleSeconds >= WAVE_MIN_IDLE_S && idleSeconds < WAVE_MAX_IDLE_S;
   if (shouldWave !== waving) {
     waving = shouldWave;
     console.log(`[lumi] aceno ${shouldWave ? 'ligado' : 'desligado'} (${idleSeconds}s sem interação)`);
@@ -99,6 +116,7 @@ function updateAttentionWave(idleSeconds) {
 function maybeFalinha(idleSeconds) {
   if (!lumiAlive() || currentTipo || waving) return;
   if (activityWin && !activityWin.isDestroyed()) return;
+  if (!dentroDoExpediente(Date.now(), perfil?.expediente)) return;
   const now = Date.now();
   if (now < walkUntil || now < nextFalinhaAt) return;
   if (idleSeconds > 45) return; // só com a pessoa ali, ativa
@@ -117,7 +135,9 @@ function maybeFalinha(idleSeconds) {
 function triggerIntervention() {
   if (currentTipo || !lumiAlive()) return;
   if (activityWin && !activityWin.isDestroyed()) return; // atividade em andamento
+  if (!dentroDoExpediente(Date.now(), perfil?.expediente)) return;
   currentTipo = rotation.next();
+  store.set('rotacaoIndex', rotation.i);
   waving = false; // a travessia substitui o aceno; o tick seguinte reavalia
   walkUntil = Date.now() + 2000;
   walkToCenter(lumiWin, pick(convites[currentTipo]), currentTipo);
@@ -197,6 +217,8 @@ if (!gotLock) {
               click: () => {
                 intervaloAtual = min;
                 scheduler.setIntervalMinutes(min);
+                perfil = { ...(perfil || {}), ritmoMin: min };
+                store.set('perfil', perfil);
               },
             })),
           },

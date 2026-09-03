@@ -1,10 +1,11 @@
 class Rotation {
-  constructor(types) {
+  constructor(types, startIndex = 0) {
     if (!Array.isArray(types) || types.length === 0) {
       throw new TypeError('Rotation exige uma lista não vazia de tipos');
     }
     this.types = types;
-    this.i = 0;
+    const idx = Number(startIndex);
+    this.i = Number.isFinite(idx) && idx >= 0 ? idx % types.length : 0;
   }
 
   next() {
