@@ -157,28 +157,29 @@ function maybeFalinha(idleSeconds) {
   // Não puxa papo se um convite está a menos de 5 min de acontecer
   if (scheduler.intervalMs - scheduler.activeMs < 5 * 60_000) return;
   agendaProximaFalinha();
-  bolhaOcupadaAte = Date.now() + FALINHA_DURATION_MS;
+  bolhaOcupadaAte = Date.now() + FALINHA_DURATION_MS + 1000;
   lumiWin.webContents.send('lumi-state', { state: 'talking', message: pickFalinha() });
   setTimeout(() => {
-    if (!currentTipo && !checkinAtivo && lumiAlive()) {
+    if (perfil && !currentTipo && !checkinAtivo && lumiAlive()) {
       lumiWin.webContents.send('lumi-state', { state: 'idle' });
     }
   }, FALINHA_DURATION_MS);
 }
 
 function triggerIntervention() {
-  if (!perfil) return; // onboarding ativo: o balão pertence a ele
-  if (checkinAtivo) return; // check-in ativo: o balão pertence a ele
-  if (currentTipo || !lumiAlive()) return;
-  if (activityWin && !activityWin.isDestroyed()) return; // atividade em andamento
-  if (!dentroDoExpediente(Date.now(), perfil?.expediente)) return;
-  if (Date.now() < bolhaOcupadaAte) return;
+  if (!perfil) return false; // onboarding ativo: o balão pertence a ele
+  if (checkinAtivo) return false; // check-in ativo: o balão pertence a ele
+  if (currentTipo || !lumiAlive()) return false;
+  if (activityWin && !activityWin.isDestroyed()) return false; // atividade em andamento
+  if (!dentroDoExpediente(Date.now(), perfil?.expediente)) return false;
+  if (Date.now() < bolhaOcupadaAte) return false;
   currentTipo = rotation.next();
   store.set('rotacaoIndex', rotation.i);
   waving = false; // a travessia substitui o aceno; o tick seguinte reavalia
   walkUntil = Date.now() + 2000;
   walkToCenter(lumiWin, pick(convites[currentTipo]), currentTipo);
   inviteTimeout = setTimeout(() => handleResponse('timeout'), INVITE_TIMEOUT_MS);
+  return true;
 }
 
 function handleResponse(answer) {
@@ -268,7 +269,7 @@ function finalizarCheckin(resp) {
           bolhaOcupadaAte = Date.now() + 15_000;
           lumiWin.webContents.send('lumi-state', { state: 'talking', message: acolhimento });
           setTimeout(() => {
-            if (lumiAlive() && !currentTipo && !checkinAtivo) {
+            if (perfil && !currentTipo && !checkinAtivo && lumiAlive()) {
               lumiWin.webContents.send('lumi-state', { state: 'idle' });
             }
           }, 14_000);
@@ -445,7 +446,7 @@ if (!gotLock) {
 
       setInterval(() => {
         tickCount += 1;
-        if (tickCount % 6 === 0 && !checandoTelaCheia) {
+        if (!checandoTelaCheia) {
           checandoTelaCheia = true;
           checarTelaCheia((full) => {
             checandoTelaCheia = false;
@@ -463,7 +464,11 @@ if (!gotLock) {
         if (emTelaCheia) return; // tudo congela: intervencões ficam adiadas
         const idleSeconds = powerMonitor.getSystemIdleTime();
         const due = scheduler.tick(Date.now(), idleSeconds, TICK_MS);
-        if (due) triggerIntervention();
+        if (due && !triggerIntervention()) {
+          // Recusado por estado transitório (falinha, cartão aberto, fora do
+          // expediente...): fica devido e tenta de novo em ~1 min
+          scheduler.snooze(Date.now(), 1);
+        }
         updateAttentionWave(idleSeconds);
         maybeFalinha(idleSeconds);
         maybeCheckin(idleSeconds);
