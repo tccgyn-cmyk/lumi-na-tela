@@ -103,6 +103,17 @@ function gerarStory(item, done) {
   const ctx = c.getContext('2d');
   const medir = (s) => ctx.measureText(s).width;
 
+  // Mede o conteúdo ANTES de desenhar: o cartão abraça o texto
+  ctx.font = 'bold 58px "Segoe UI", sans-serif';
+  const linhasTitulo = quebrarLinhas(item.titulo, 780, medir);
+  ctx.font = '44px "Segoe UI", sans-serif';
+  const linhasTexto = quebrarLinhas(item.texto, 780, medir);
+
+  const alturaConteudo =
+    linhasTitulo.length * 72 + 60 + linhasTexto.length * 62 + 20 + 60; // título + respiro + texto + respiro + assinatura
+  const cardH = alturaConteudo + 220; // padding interno
+  const cardTop = Math.max(260, Math.round((1580 - cardH) / 2) + 160);
+
   const fundo = ctx.createLinearGradient(0, 0, 0, 1920);
   fundo.addColorStop(0, '#fdf8e8');
   fundo.addColorStop(1, '#dff0ec');
@@ -110,7 +121,7 @@ function gerarStory(item, done) {
   ctx.fillRect(0, 0, 1080, 1920);
 
   ctx.fillStyle = '#ffffff';
-  roundRect(ctx, 90, 360, 900, 1040, 48);
+  roundRect(ctx, 90, cardTop, 900, cardH, 48);
   ctx.fill();
 
   ctx.textAlign = 'center';
@@ -118,17 +129,15 @@ function gerarStory(item, done) {
 
   ctx.fillStyle = '#3f9e94';
   ctx.font = 'bold 58px "Segoe UI", sans-serif';
-  const linhasTitulo = quebrarLinhas(item.titulo, 780, medir);
-  let y = desenharLinhas(ctx, linhasTitulo, 540, 490, 72);
+  let y = desenharLinhas(ctx, linhasTitulo, 540, cardTop + 130, 72);
 
   ctx.fillStyle = '#3a3a3a';
   ctx.font = '44px "Segoe UI", sans-serif';
-  const linhasTexto = quebrarLinhas(item.texto, 780, medir);
   y = desenharLinhas(ctx, linhasTexto, 540, y + 60, 62);
 
   ctx.fillStyle = '#3f9e94';
   ctx.font = 'italic 40px "Segoe UI", sans-serif';
-  ctx.fillText('— @robertoribeiropsi', 540, Math.min(y + 80, 1340));
+  ctx.fillText('— @robertoribeiropsi', 540, y + 20);
 
   ctx.fillStyle = '#b09a55';
   ctx.font = '34px "Segoe UI", sans-serif';
@@ -136,7 +145,10 @@ function gerarStory(item, done) {
 
   const img = new Image();
   img.onload = () => {
-    ctx.drawImage(img, 780, 1440, 230, 205);
+    // Proporção real do personagem (sprite alto e fino)
+    const alturaLumi = 280;
+    const larguraLumi = Math.round((alturaLumi * img.width) / img.height);
+    ctx.drawImage(img, 1080 - 100 - larguraLumi, 1920 - 150 - alturaLumi, larguraLumi, alturaLumi);
     done(c.toDataURL('image/png'));
   };
   img.onerror = () => done(c.toDataURL('image/png'));
