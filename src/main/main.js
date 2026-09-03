@@ -10,6 +10,7 @@ const { walkToCenter, returnHome } = require('./intervention');
 const { createStore } = require('./store');
 const { dentroDoExpediente } = require('./expediente');
 const { ancoraDevida, precisaAcolher } = require('./checkin-rules');
+const { checarTelaCheia } = require('./fullscreen');
 const { diaISO } = require('../shared/dias');
 const { convites, falinhas, RODIZIO, tagsCheckin, acolhimento } = require('../shared/content');
 
@@ -60,6 +61,10 @@ let waving = false;
 
 let checkinAtivo = null; // âncora em andamento ('chegada'|'saida') ou null
 let checkinTimeout = null;
+
+let emTelaCheia = false;
+let checandoTelaCheia = false;
+let tickCount = 0;
 
 // Até quando o balão está ocupado por uma fala (falinha/acolhimento).
 // Nenhum outro dono do balão pode assumir antes disso.
@@ -439,6 +444,23 @@ if (!gotLock) {
       });
 
       setInterval(() => {
+        tickCount += 1;
+        if (tickCount % 6 === 0 && !checandoTelaCheia) {
+          checandoTelaCheia = true;
+          checarTelaCheia((full) => {
+            checandoTelaCheia = false;
+            if (full === emTelaCheia) return;
+            emTelaCheia = full;
+            if (!lumiAlive()) return;
+            if (emTelaCheia) {
+              lumiWin.hide();
+            } else {
+              lumiWin.showInactive();
+              walkUntil = Date.now() + 60_000; // folga de 1 min ao voltar
+            }
+          });
+        }
+        if (emTelaCheia) return; // tudo congela: intervencões ficam adiadas
         const idleSeconds = powerMonitor.getSystemIdleTime();
         const due = scheduler.tick(Date.now(), idleSeconds, TICK_MS);
         if (due) triggerIntervention();
