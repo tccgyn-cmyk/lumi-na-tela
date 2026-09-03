@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Lumi — seu companheiro de saúde mental na tela (PsicoLabs)",
   "main": "src/main/main.js",
+  "repository": "github:tccgyn-cmyk/lumi-na-tela",
   "author": "Roberto Ribeiro — PsicoLabs",
   "license": "UNLICENSED",
   "scripts": {
@@ -43,6 +44,12 @@
       "icon": "build/icon.png",
       "category": "public.app-category.healthcare-fitness"
     },
-    "publish": null
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "tccgyn-cmyk",
+        "repo": "lumi-na-tela"
+      }
+    ]
   }
 }
