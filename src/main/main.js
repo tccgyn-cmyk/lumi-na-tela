@@ -13,6 +13,7 @@ const { dentroDoExpediente } = require('./expediente');
 const { ancoraDevida, precisaAcolher } = require('./checkin-rules');
 const { checarTelaCheia } = require('./fullscreen');
 const { ctaDevido } = require('./cta-rules');
+const { iniciarConteudoRemoto } = require('./remoto');
 const { diaISO } = require('../shared/dias');
 const {
   convites,
@@ -384,6 +385,8 @@ if (!gotLock) {
       if (!store.get('primeiroDiaUso', null)) {
         store.set('primeiroDiaUso', diaISO(Date.now()));
       }
+
+      iniciarConteudoRemoto();
 
       lumiWin.webContents.once('did-finish-load', () => {
         if (!perfil && lumiAlive()) {
