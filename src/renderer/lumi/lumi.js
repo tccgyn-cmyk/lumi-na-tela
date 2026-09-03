@@ -87,6 +87,12 @@ lumiEl.addEventListener('contextmenu', (e) => {
 window.lumiAPI.onState((s) => {
   ignoring = null; // main pinou/despinou por fora; força o próximo envio
   if (s.state) setPose(s.state);
+  window.dispatchEvent(new CustomEvent('lumi-estado', { detail: s }));
+  if (s.state === 'onboarding') {
+    bubble.classList.remove('hidden');
+    bubbleActions.classList.add('hidden');
+    return; // onboarding.js assume o balão a partir daqui
+  }
   if (s.state === 'invite') {
     bubbleText.textContent = s.message || '';
     bubble.classList.remove('hidden');

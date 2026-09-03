@@ -84,7 +84,7 @@ function pickFalinha() {
   );
   const escolhida = pick(opcoes.length ? opcoes : falinhas);
   ultimaFalinha = escolhida.texto;
-  return escolhida.texto;
+  return escolhida.texto.replaceAll('{nome}', (perfil && perfil.nome) || 'você');
 }
 // Enquanto o Lumi está atravessando a tela (1,8s), o estado final da
 // travessia ("idle") chega atrasado e engoliria um aceno enviado no meio.
@@ -99,6 +99,7 @@ function pick(list) {
 }
 
 function updateAttentionWave(idleSeconds) {
+  if (!perfil) return; // onboarding ativo: o balão pertence a ele
   if (!lumiAlive() || currentTipo) return;
   if (Date.now() < walkUntil) return; // espera a travessia terminar
   const foraDoExpediente = !dentroDoExpediente(Date.now(), perfil?.expediente);
@@ -114,6 +115,7 @@ function updateAttentionWave(idleSeconds) {
 }
 
 function maybeFalinha(idleSeconds) {
+  if (!perfil) return; // onboarding ativo: o balão pertence a ele
   if (!lumiAlive() || currentTipo || waving) return;
   if (activityWin && !activityWin.isDestroyed()) return;
   if (!dentroDoExpediente(Date.now(), perfil?.expediente)) return;
@@ -133,6 +135,7 @@ function maybeFalinha(idleSeconds) {
 }
 
 function triggerIntervention() {
+  if (!perfil) return; // onboarding ativo: o balão pertence a ele
   if (currentTipo || !lumiAlive()) return;
   if (activityWin && !activityWin.isDestroyed()) return; // atividade em andamento
   if (!dentroDoExpediente(Date.now(), perfil?.expediente)) return;
@@ -183,12 +186,46 @@ if (!gotLock) {
         lumiWin = null;
       });
 
+      lumiWin.webContents.once('did-finish-load', () => {
+        if (!perfil && lumiAlive()) {
+          lumiWin.setIgnoreMouseEvents(false); // pinada durante o onboarding
+          lumiWin.webContents.send('lumi-state', { state: 'onboarding' });
+        }
+      });
+
       ipcMain.on('set-ignore-mouse', (e, ignore) => {
         const win = BrowserWindow.fromWebContents(e.sender);
         if (win === lumiWin && win && !win.isDestroyed()) {
           if (currentTipo) return; // convite ativo: janela pinada interativa
+          if (!perfil) return; // onboarding ativo: janela pinada
           win.setIgnoreMouseEvents(Boolean(ignore), { forward: true });
         }
+      });
+
+      ipcMain.on('onboarding-done', (e, dados) => {
+        const win = BrowserWindow.fromWebContents(e.sender);
+        if (!win || win !== lumiWin || win.isDestroyed()) return;
+        const ritmo = [50, 60, 90].includes(Number(dados?.ritmoMin)) ? Number(dados.ritmoMin) : 60;
+        const expediente =
+          dados?.expediente?.turnos === true
+            ? { turnos: true }
+            : {
+                inicio: typeof dados?.expediente?.inicio === 'string' ? dados.expediente.inicio : '08:00',
+                fim: typeof dados?.expediente?.fim === 'string' ? dados.expediente.fim : '18:00',
+              };
+        perfil = {
+          nome: String(dados?.nome || '').slice(0, 30),
+          profissao: String(dados?.profissao || '').slice(0, 40),
+          ritmoMin: ritmo,
+          expediente,
+        };
+        store.set('perfil', perfil);
+        if (!process.env.LUMI_DEV_INTERVAL) {
+          intervaloAtual = ritmo;
+          scheduler.setIntervalMinutes(ritmo);
+        }
+        win.setIgnoreMouseEvents(true, { forward: true });
+        win.webContents.send('lumi-state', { state: 'idle' });
       });
 
       ipcMain.on('intervention-response', (e, answer) => {
@@ -233,6 +270,18 @@ if (!gotLock) {
             })),
           },
           { label: 'Voltar ao normal', click: () => scheduler.silence(Date.now(), 0) },
+          { type: 'separator' },
+          {
+            label: 'Recomeçar apresentação',
+            click: () => {
+              perfil = null;
+              store.set('perfil', null);
+              if (lumiAlive()) {
+                lumiWin.setIgnoreMouseEvents(false);
+                lumiWin.webContents.send('lumi-state', { state: 'onboarding' });
+              }
+            },
+          },
           { type: 'separator' },
           { label: 'Sair do Lumi', click: () => app.quit() },
         ]);

@@ -133,3 +133,25 @@ html, body {
   font-weight: 600;
 }
 .hidden { display: none !important; }
+
+/* Onboarding */
+#onboard { display: flex; flex-direction: column; gap: 8px; }
+#onboard-input {
+  border: 1.5px solid #7cc7ba;
+  border-radius: 10px;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+}
+.onboard-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+.onboard-buttons button {
+  border: none;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  background: #e4f2ef;
+  color: #3a3a3a;
+}
+.onboard-buttons button.primario { background: #ffe08a; font-weight: 600; }

@@ -127,6 +127,8 @@ const falinhas = [
   { texto: 'Eu vi você aí, focado. Orgulho define. 💪' },
   { texto: 'Um plantão de cada vez. Uma pausa de cada vez.' },
   { texto: 'Café é combustível, mas pausa é manutenção. ⛽' },
+  { texto: 'Tô de olho em você, {nome}... do jeito mais fofo possível. 👀💛' },
+  { texto: '{nome}, já te disseram hoje que seu trabalho importa? Então tá dito.' },
 ];
 
 // Pílulas de psicoeducação — ACT, DBT, TCC e autocuidado do profissional
