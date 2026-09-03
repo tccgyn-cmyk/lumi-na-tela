@@ -18,11 +18,20 @@
       <input id="onboard-input" maxlength="30" placeholder="Digite aqui..." />
       <div id="onboard-buttons" class="onboard-buttons"></div>
     </div>
+    <div id="checkin" class="hidden">
+      <div id="checkin-faces" class="checkin-faces"></div>
+      <div id="checkin-tags" class="checkin-tags hidden"></div>
+      <div class="checkin-acoes">
+        <button id="checkin-enviar" class="hidden">Pronto 💛</button>
+        <button id="checkin-pular">Pular</button>
+      </div>
+    </div>
   </div>
   <div id="lumi" data-state="idle">
     <img id="lumi-sprite" src="img/idle.png" alt="" draggable="false" />
   </div>
   <script src="lumi.js"></script>
   <script src="onboarding.js"></script>
+  <script src="checkin.js"></script>
 </body>
 </html>

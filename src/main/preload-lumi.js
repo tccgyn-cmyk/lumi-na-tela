@@ -5,5 +5,6 @@ contextBridge.exposeInMainWorld('lumiAPI', {
   openMenu: () => ipcRenderer.send('lumi-menu'),
   respond: (answer) => ipcRenderer.send('intervention-response', answer),
   onboardingDone: (perfil) => ipcRenderer.send('onboarding-done', perfil),
+  checkinResponder: (resp) => ipcRenderer.send('checkin-response', resp),
   onState: (cb) => ipcRenderer.on('lumi-state', (_e, s) => cb(s)),
 });

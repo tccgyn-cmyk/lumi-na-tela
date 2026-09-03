@@ -7,7 +7,9 @@ const { Rotation } = require('./rotation');
 const { walkToCenter, returnHome } = require('./intervention');
 const { createStore } = require('./store');
 const { dentroDoExpediente } = require('./expediente');
-const { convites, falinhas, RODIZIO } = require('../shared/content');
+const { ancoraDevida, precisaAcolher } = require('./checkin-rules');
+const { diaISO } = require('../shared/dias');
+const { convites, falinhas, RODIZIO, tagsCheckin, acolhimento } = require('../shared/content');
 
 const TICK_MS = 5000;
 const INVITE_TIMEOUT_MS = 2 * 60_000;
@@ -52,6 +54,19 @@ const rotation = new Rotation(RODIZIO, store.get('rotacaoIndex', 0));
 let currentTipo = null;
 let inviteTimeout = null;
 let waving = false;
+
+let checkinAtivo = null; // âncora em andamento ('chegada'|'saida') ou null
+let checkinTimeout = null;
+
+function estadoDoDia() {
+  const hoje = diaISO(Date.now());
+  let dia = store.get('diaAtual', null);
+  if (!dia || dia.dia !== hoje) {
+    dia = { dia: hoje, firstActiveMs: null, feitos: {} };
+    store.set('diaAtual', dia);
+  }
+  return dia;
+}
 
 // Falinhas: conversa espontânea ~1x/hora (45-75 min), fora de convites.
 // LUMI_DEV_FALINHA=20 → primeira em 20s e a cada ~60s (para testar).
@@ -100,6 +115,7 @@ function pick(list) {
 
 function updateAttentionWave(idleSeconds) {
   if (!perfil) return; // onboarding ativo: o balão pertence a ele
+  if (checkinAtivo) return; // check-in ativo: o balão pertence a ele
   if (!lumiAlive() || currentTipo) return;
   if (Date.now() < walkUntil) return; // espera a travessia terminar
   const foraDoExpediente = !dentroDoExpediente(Date.now(), perfil?.expediente);
@@ -116,6 +132,7 @@ function updateAttentionWave(idleSeconds) {
 
 function maybeFalinha(idleSeconds) {
   if (!perfil) return; // onboarding ativo: o balão pertence a ele
+  if (checkinAtivo) return; // check-in ativo: o balão pertence a ele
   if (!lumiAlive() || currentTipo || waving) return;
   if (activityWin && !activityWin.isDestroyed()) return;
   if (!dentroDoExpediente(Date.now(), perfil?.expediente)) return;
@@ -136,6 +153,7 @@ function maybeFalinha(idleSeconds) {
 
 function triggerIntervention() {
   if (!perfil) return; // onboarding ativo: o balão pertence a ele
+  if (checkinAtivo) return; // check-in ativo: o balão pertence a ele
   if (currentTipo || !lumiAlive()) return;
   if (activityWin && !activityWin.isDestroyed()) return; // atividade em andamento
   if (!dentroDoExpediente(Date.now(), perfil?.expediente)) return;
@@ -172,6 +190,74 @@ function handleResponse(answer) {
   }
 }
 
+function maybeCheckin(idleSeconds) {
+  if (!lumiAlive() || currentTipo || checkinAtivo || waving) return;
+  if (activityWin && !activityWin.isDestroyed()) return;
+  const now = Date.now();
+  if (now < walkUntil) return;
+  if (idleSeconds > 45) return;
+  if (now < scheduler.silencedUntil) return;
+  if (!dentroDoExpediente(now, perfil?.expediente)) return;
+  if (!perfil) return; // sem onboarding, sem check-in
+
+  const dia = estadoDoDia();
+  if (dia.firstActiveMs === null && idleSeconds <= 45) {
+    dia.firstActiveMs = now;
+    store.set('diaAtual', dia);
+  }
+  const ancora = ancoraDevida(now, dia);
+  if (!ancora) return;
+
+  checkinAtivo = ancora;
+  lumiWin.setIgnoreMouseEvents(false);
+  lumiWin.webContents.send('lumi-state', { state: 'checkin', ancora, tags: tagsCheckin });
+  checkinTimeout = setTimeout(() => finalizarCheckin({ ancora, skip: true }), 60_000);
+}
+
+function finalizarCheckin(resp) {
+  if (!checkinAtivo) return;
+  const ancora = checkinAtivo;
+  checkinAtivo = null;
+  clearTimeout(checkinTimeout);
+  checkinTimeout = null;
+
+  const dia = estadoDoDia();
+  dia.feitos[ancora] = true;
+  store.set('diaAtual', dia);
+
+  if (!resp.skip && Number.isInteger(resp.nota) && resp.nota >= 1 && resp.nota <= 5) {
+    const checkins = store.get('checkins', []);
+    checkins.push({
+      dia: dia.dia,
+      ancora,
+      nota: resp.nota,
+      tags: Array.isArray(resp.tags) ? resp.tags.slice(0, 6).map(String) : [],
+    });
+    store.set('checkins', checkins);
+
+    // Acolhimento: no máximo 1 a cada 3 dias
+    const ultimo = store.get('ultimoAcolhimento', 0);
+    if (precisaAcolher(checkins, Date.now()) && Date.now() - ultimo > 3 * 86_400_000) {
+      store.set('ultimoAcolhimento', Date.now());
+      setTimeout(() => {
+        if (lumiAlive() && !currentTipo && !checkinAtivo) {
+          lumiWin.webContents.send('lumi-state', { state: 'talking', message: acolhimento });
+          setTimeout(() => {
+            if (lumiAlive() && !currentTipo) {
+              lumiWin.webContents.send('lumi-state', { state: 'idle' });
+            }
+          }, 14_000);
+        }
+      }, 1200);
+    }
+  }
+
+  if (lumiAlive()) {
+    lumiWin.setIgnoreMouseEvents(true, { forward: true });
+    lumiWin.webContents.send('lumi-state', { state: 'idle' });
+  }
+}
+
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();
@@ -198,6 +284,7 @@ if (!gotLock) {
         if (win === lumiWin && win && !win.isDestroyed()) {
           if (currentTipo) return; // convite ativo: janela pinada interativa
           if (!perfil) return; // onboarding ativo: janela pinada
+          if (checkinAtivo) return; // check-in ativo: janela pinada interativa
           win.setIgnoreMouseEvents(Boolean(ignore), { forward: true });
         }
       });
@@ -226,6 +313,12 @@ if (!gotLock) {
         }
         win.setIgnoreMouseEvents(true, { forward: true });
         win.webContents.send('lumi-state', { state: 'idle' });
+      });
+
+      ipcMain.on('checkin-response', (e, resp) => {
+        const win = BrowserWindow.fromWebContents(e.sender);
+        if (!win || win !== lumiWin || win.isDestroyed()) return;
+        finalizarCheckin(resp || { skip: true });
       });
 
       ipcMain.on('intervention-response', (e, answer) => {
@@ -294,6 +387,7 @@ if (!gotLock) {
         if (due) triggerIntervention();
         updateAttentionWave(idleSeconds);
         maybeFalinha(idleSeconds);
+        maybeCheckin(idleSeconds);
       }, TICK_MS);
     })
     .catch((err) => {

@@ -155,3 +155,36 @@ html, body {
   color: #3a3a3a;
 }
 .onboard-buttons button.primario { background: #ffe08a; font-weight: 600; }
+
+/* Check-in emocional */
+#checkin { display: flex; flex-direction: column; gap: 8px; }
+.checkin-faces { display: flex; gap: 6px; justify-content: center; }
+.checkin-faces button {
+  border: none;
+  background: #e4f2ef;
+  border-radius: 10px;
+  font-size: 19px;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+.checkin-faces button.escolhida { background: #ffe08a; }
+.checkin-tags { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
+.checkin-tags button {
+  border: none;
+  background: #f0ede2;
+  border-radius: 999px;
+  font-size: 11px;
+  padding: 4px 9px;
+  cursor: pointer;
+}
+.checkin-tags button.marcada { background: #7cc7ba; color: #fff; }
+.checkin-acoes { display: flex; gap: 6px; justify-content: center; }
+.checkin-acoes button {
+  border: none;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  background: #e4f2ef;
+}
+.checkin-acoes #checkin-enviar { background: #ffe08a; font-weight: 600; }
