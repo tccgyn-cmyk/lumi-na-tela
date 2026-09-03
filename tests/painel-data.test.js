@@ -56,6 +56,6 @@ describe('dadosDoPainel', () => {
       },
       hoje
     );
-    expect(dados.destaque).toContain('quinta'); // 3 de setembro de 2026 é quinta
+    expect(dados.destaque).toContain('Quinta'); // 3 de setembro de 2026 é quinta
   });
 });

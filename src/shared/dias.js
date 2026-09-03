@@ -7,10 +7,14 @@ function diaISO(ms) {
   return `${d.getFullYear()}-${m}-${dia}`;
 }
 
-// N dias terminando em nowMs, do mais antigo ao mais recente
+// N dias terminando em nowMs, do mais antigo ao mais recente.
+// Anda por dias de calendário (não por 24h fixas), imune a horário de verão.
 function ultimosDias(nowMs, n) {
+  const d = new Date(nowMs);
   const out = [];
-  for (let i = n - 1; i >= 0; i--) out.push(diaISO(nowMs - i * DIA_MS));
+  for (let i = n - 1; i >= 0; i--) {
+    out.push(diaISO(new Date(d.getFullYear(), d.getMonth(), d.getDate() - i).getTime()));
+  }
   return out;
 }
 

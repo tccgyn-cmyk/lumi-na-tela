@@ -35,6 +35,14 @@ describe('ancoraDevida', () => {
     expect(ancoraDevida(as(10), { firstActiveMs: null, feitos: {} })).toBeNull();
     expect(ancoraDevida(as(10), null)).toBeNull();
   });
+
+  it('saida so depois de pelo menos 4h de jornada (plantao noturno)', () => {
+    const inicio = as(19, 0);
+    const estado = { firstActiveMs: inicio, feitos: { chegada: true } };
+    expect(ancoraDevida(as(19, 30), estado)).toBeNull(); // 30 min de plantao: cedo
+    const estadoTarde = { firstActiveMs: as(11, 0), feitos: { chegada: true } };
+    expect(ancoraDevida(as(16, 30), estadoTarde)).toBe('saida'); // 5h30 de jornada
+  });
 });
 
 describe('precisaAcolher', () => {
@@ -61,6 +69,15 @@ describe('precisaAcolher', () => {
     const regs = [
       reg(dia(1), 'saida', 1), reg(dia(2), 'saida', 2), reg(dia(3), 'saida', 1),
       reg(dia(3), 'chegada', 5),
+    ];
+    expect(precisaAcolher(regs, hoje)).toBe(true);
+  });
+
+  it('acolhimento usa a media do dia, nao todas as notas', () => {
+    const regs = [
+      reg(dia(1), 'chegada', 1), reg(dia(1), 'chegada', 3), // media 2.0
+      reg(dia(2), 'chegada', 2),
+      reg(dia(3), 'chegada', 1),
     ];
     expect(precisaAcolher(regs, hoje)).toBe(true);
   });

@@ -1,13 +1,14 @@
-const { diaISO, ultimosDias, DIA_MS } = require('../shared/dias');
+const { diaISO, ultimosDias } = require('../shared/dias');
 
 function sequenciaAtual(pausasPorDia, nowMs) {
-  let seq = 0;
-  let cursor = nowMs;
+  const d = new Date(nowMs);
+  const cursor = new Date(d.getFullYear(), d.getMonth(), d.getDate());
   // hoje sem pausa ainda não quebra a sequência — começa a contar de ontem
-  if (!(pausasPorDia[diaISO(cursor)] > 0)) cursor -= DIA_MS;
-  while (pausasPorDia[diaISO(cursor)] > 0) {
+  if (!(pausasPorDia[diaISO(cursor.getTime())] > 0)) cursor.setDate(cursor.getDate() - 1);
+  let seq = 0;
+  while (pausasPorDia[diaISO(cursor.getTime())] > 0) {
     seq += 1;
-    cursor -= DIA_MS;
+    cursor.setDate(cursor.getDate() - 1);
   }
   return seq;
 }
@@ -20,7 +21,8 @@ function destaqueDaSemana(pausas, humor) {
     const pior = comSaida.reduce((a, b) => (b.saida < a.saida ? b : a));
     if (pior.saida <= 2) {
       const nome = NOMES_DIAS[new Date(`${pior.dia}T12:00:00`).getDay()];
-      return `${nome} foi seu dia mais pesado. Que tal se preparar com carinho pro próximo?`;
+      const nomeCap = nome.charAt(0).toUpperCase() + nome.slice(1);
+      return `${nomeCap} foi seu dia mais pesado. Que tal se preparar com carinho pro próximo?`;
     }
   }
   const total = pausas.reduce((s, p) => s + p.pausas, 0);
@@ -33,6 +35,8 @@ function dadosDoPainel({ pausasPorDia = {}, checkins = [] }, nowMs) {
   const dias = ultimosDias(nowMs, 7);
   const pausas = dias.map((dia) => ({ dia, pausas: pausasPorDia[dia] || 0 }));
   const humor = dias.map((dia) => {
+    // Assume checkins em ordem cronológica de registro (o store faz append);
+    // em caso de duplicata no dia, vale a última.
     const notaDe = (ancora) => {
       const doDia = checkins.filter((c) => c.dia === dia && c.ancora === ancora);
       return doDia.length ? doDia[doDia.length - 1].nota : null;

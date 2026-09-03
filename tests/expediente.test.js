@@ -25,4 +25,8 @@ describe('expediente', () => {
     expect(dentroDoExpediente(as(3), null)).toBe(true);
     expect(dentroDoExpediente(as(3), undefined)).toBe(true);
   });
+
+  it('horario invalido (25:00) falha aberto: sempre dentro', () => {
+    expect(dentroDoExpediente(as(3), { inicio: '25:00', fim: '18:00' })).toBe(true);
+  });
 });

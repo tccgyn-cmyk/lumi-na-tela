@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { microPausas, exercicios, convites, falinhas, pilulas, tagsCheckin, acolhimento } from '../src/shared/content.js';
+import { microPausas, exercicios, convites, falinhas, pilulas, tagsCheckin, acolhimento, RODIZIO } from '../src/shared/content.js';
 
 describe('Conteúdo', () => {
   it('tem pelo menos 10 micro-pausas com titulo e texto', () => {
@@ -44,7 +44,7 @@ describe('Conteúdo', () => {
   });
 
   it('todo tipo do rodizio tem convites', () => {
-    for (const t of ['micro-pausa', 'respiracao', 'pilula']) {
+    for (const t of new Set(RODIZIO)) {
       expect(Array.isArray(convites[t]) && convites[t].length > 0).toBe(true);
     }
   });

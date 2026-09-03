@@ -14,18 +14,32 @@ function createStore(filePath) {
       data = parsed;
     }
   } catch (_err) {
-    // Arquivo corrompido: preserva como .bak e recomeça limpo (sem crash)
+    // Arquivo corrompido: preserva como .bak (sem sobrescrever um .bak
+    // anterior, que pode ser o último backup bom) e recomeça limpo
     try {
-      fs.renameSync(filePath, `${filePath}.bak`);
+      if (!fs.existsSync(`${filePath}.bak`)) {
+        fs.renameSync(filePath, `${filePath}.bak`);
+      } else {
+        fs.rmSync(filePath, { force: true });
+      }
     } catch (_renameErr) {
-      /* se nem renomear der, seguimos com dados vazios */
+      /* se nem isso der, seguimos com dados vazios */
     }
     data = {};
   }
 
   function persist() {
-    fs.mkdirSync(path.dirname(filePath), { recursive: true });
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    // Escrita atômica: tmp + rename, para nunca deixar JSON truncado
+    try {
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      const tmp = `${filePath}.tmp`;
+      fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
+      fs.renameSync(tmp, filePath);
+    } catch (err) {
+      // Falha de I/O (ex.: antivírus segurando o arquivo) não pode derrubar
+      // o app — seguimos com o estado em memória e tentamos no próximo set
+      console.error('[lumi] falha ao persistir dados', err);
+    }
   }
 
   return {

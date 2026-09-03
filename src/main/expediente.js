@@ -1,6 +1,9 @@
 // expediente: { inicio: 'HH:MM', fim: 'HH:MM' } | { turnos: true } | null
 function parseHHMM(s) {
   const [h, m] = String(s).split(':').map(Number);
+  if (!Number.isFinite(h) || !Number.isFinite(m) || h < 0 || h > 23 || m < 0 || m > 59) {
+    return NaN;
+  }
   return h * 60 + m;
 }
 

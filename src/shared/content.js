@@ -170,4 +170,8 @@ const tagsCheckin = ['Plantão puxado', 'Caso difícil', 'Dia bom', 'Cansaço', 
 const acolhimento =
   'Percebi uns dias difíceis seguidos por aqui. Você merece o mesmo cuidado que oferece — conversar com alguém de confiança ou um profissional ajuda de verdade. E se apertar, o CVV escuta 24h: ligue 188. 💛';
 
-module.exports = { microPausas, exercicios, convites, falinhas, pilulas, tagsCheckin, acolhimento };
+// Padrão canônico do rodízio de convites (pílula a cada 4 convites).
+// main.js e os testes derivam daqui — nunca duplicar esta lista.
+const RODIZIO = ['micro-pausa', 'respiracao', 'micro-pausa', 'pilula'];
+
+module.exports = { microPausas, exercicios, convites, falinhas, pilulas, tagsCheckin, acolhimento, RODIZIO };

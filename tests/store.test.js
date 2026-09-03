@@ -40,4 +40,22 @@ describe('store', () => {
     s.set('x', true);
     expect(fs.existsSync(file)).toBe(true);
   });
+
+  it('segunda corrupcao nao sobrescreve o .bak anterior', () => {
+    const file = path.join(dir, 'dados.json');
+    fs.writeFileSync(file, 'lixo-1');
+    createStore(file); // vira .bak
+    const bakAntes = fs.readFileSync(file + '.bak', 'utf8');
+    fs.writeFileSync(file, 'lixo-2');
+    createStore(file); // NAO pode sobrescrever o .bak
+    expect(fs.readFileSync(file + '.bak', 'utf8')).toBe(bakAntes);
+  });
+
+  it('nao deixa arquivo .tmp para tras apos gravar', () => {
+    const file = path.join(dir, 'dados.json');
+    const s = createStore(file);
+    s.set('a', 1);
+    expect(fs.existsSync(file + '.tmp')).toBe(false);
+    expect(JSON.parse(fs.readFileSync(file, 'utf8')).a).toBe(1);
+  });
 });
