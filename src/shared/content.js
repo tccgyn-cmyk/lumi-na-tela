@@ -132,7 +132,7 @@ const falinhas = [
 ];
 
 // Pílulas de psicoeducação — ACT, DBT, TCC e autocuidado do profissional
-// de saúde. TODO TEXTO PASSA PELA APROVAÇÃO DO ROBERTO ANTES DO LANÇAMENTO.
+// de saúde. Textos aprovados pelo Roberto em 2026-09-03.
 // Assinatura (@robertoribeiropsi) é adicionada pela UI, não pelo texto.
 const pilulas = [
   { id: 'descompressao', titulo: 'Fechar o capítulo', texto: 'Entre um paciente e outro, 3 respirações conscientes já dizem pro teu corpo: "esse capítulo fechou". Isso é regulação, não frescura.' },
@@ -202,7 +202,7 @@ const produtos = {
   },
 };
 
-// TODO: TODO TEXTO PASSA PELA APROVAÇÃO DO ROBERTO ANTES DO LANÇAMENTO
+// Textos aprovados pelo Roberto em 2026-09-03
 const ctas = [
   { produto: 'metodo', texto: 'Sabia que comunicar notícias difíceis é técnica que se aprende? O Roberto criou um método pra isso. Quer ver? 👀' },
   { produto: 'metodo', texto: 'Se a conversa difícil com paciente ainda dá frio na barriga, o Método Arquitetura do Encontro Hospitalar é pra você.' },

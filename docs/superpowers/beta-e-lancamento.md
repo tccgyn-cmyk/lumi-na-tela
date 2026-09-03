@@ -1,11 +1,11 @@
 # Beta e lançamento — checklist
 
 ## Antes de qualquer coisa (aprovações do Roberto)
-- [ ] Textos aprovados em `src/shared/content.js`: micro-pausas, exercícios, convites, falinhas, pílulas, CTAs, acolhimento
-- [ ] Visual do story de compartilhamento aprovado
-- [ ] Decisão da teleconsulta maximizada (manter só tela cheia / suprimir maximizadas)
+- [x] Textos aprovados em `src/shared/content.js` (Roberto, 2026-09-03, via página "A Voz do Lumi")
+- [x] Visual do story de compartilhamento aprovado (2026-09-03)
+- [x] Decisão da teleconsulta: manter supressão só em tela cheia real (2026-09-03)
 - [ ] Roteiros de teste manual das Fases 3 e 4 executados
-- [ ] Merge de `fase-3` + `fase-4` + `fase-5` em `main`
+- [x] Merge de todas as fases em `main` (2026-09-03)
 
 ## Configurar o GitHub (passo manual do Roberto, ~10 min, uma vez só)
 1. Criar conta em github.com (se ainda não tiver)
