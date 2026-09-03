@@ -1,6 +1,6 @@
 const { BrowserWindow } = require('electron');
 const path = require('path');
-const { microPausas, exercicios } = require('../shared/content');
+const { microPausas, exercicios, pilulas } = require('../shared/content');
 
 function pick(list) {
   return list[Math.floor(Math.random() * list.length)];
@@ -8,14 +8,17 @@ function pick(list) {
 
 const lastIds = {};
 
-function pickContent(tipo) {
-  const list = tipo === 'micro-pausa' ? microPausas : exercicios;
+function draw(list, tipo) {
   let item = pick(list);
-  if (list.length > 1 && item.id === lastIds[tipo]) {
-    item = pick(list);
-  }
+  if (list.length > 1 && item.id === lastIds[tipo]) item = pick(list);
   lastIds[tipo] = item.id;
-  return { tipo, ...item };
+  return item;
+}
+
+function pickContent(tipo) {
+  if (tipo === 'micro-pausa') return { tipo, ...draw(microPausas, tipo) };
+  if (tipo === 'pilula') return { tipo, ...draw(pilulas, tipo) };
+  return { tipo, ...draw(exercicios, tipo) };
 }
 
 function openActivity(tipo) {

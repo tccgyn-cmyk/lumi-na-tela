@@ -8,6 +8,12 @@ const textoEl = document.getElementById('texto');
 
 window.activityAPI.onData((item) => {
   tituloEl.textContent = item.titulo || '';
+  if (item.tipo === 'pilula') {
+    textoEl.textContent = item.texto || '';
+    textoEl.classList.remove('hidden');
+    document.getElementById('assinatura').classList.remove('hidden');
+    return;
+  }
   if (item.tipo === 'micro-pausa') {
     textoEl.textContent = item.texto || '';
     textoEl.classList.remove('hidden');
