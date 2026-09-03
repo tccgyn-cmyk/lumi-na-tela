@@ -6,9 +6,14 @@ on:
   push:
     tags: ['v*']
 
+# O token padrão precisa de escrita para criar a Release com os instaladores
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
