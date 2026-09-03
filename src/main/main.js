@@ -2,6 +2,8 @@ const path = require('path');
 const { app, BrowserWindow, ipcMain, Menu, powerMonitor } = require('electron');
 const { createLumiWindow } = require('./lumi-window');
 const { openActivity } = require('./activity-window');
+const { openPainel } = require('./painel-window');
+const { dadosDoPainel } = require('./painel-data');
 const { Scheduler } = require('./scheduler');
 const { Rotation } = require('./rotation');
 const { walkToCenter, returnHome } = require('./intervention');
@@ -47,6 +49,7 @@ function ritmoInicial() {
 
 let lumiWin = null;
 let activityWin = null;
+let painelWin = null;
 let intervaloAtual = ritmoInicial(); // minutos (ajustável no menu)
 const scheduler = new Scheduler({ intervalMinutes: intervaloAtual });
 // Rodízio da fase 3 (canônico em content.js): pílula a cada 4 convites
@@ -181,6 +184,10 @@ function handleResponse(answer) {
     scheduler.snooze(Date.now(), 10);
   }
   if (answer === 'accept') {
+    const pausasPorDia = store.get('pausasPorDia', {});
+    const hoje = diaISO(Date.now());
+    pausasPorDia[hoje] = (pausasPorDia[hoje] || 0) + 1;
+    store.set('pausasPorDia', pausasPorDia);
     if (activityWin && !activityWin.isDestroyed()) activityWin.close();
     const win = openActivity(tipo);
     activityWin = win;
@@ -258,6 +265,22 @@ function finalizarCheckin(resp) {
   }
 }
 
+function abrirPainelSemanal() {
+  if (painelWin && !painelWin.isDestroyed()) {
+    painelWin.focus();
+    return;
+  }
+  const dados = dadosDoPainel(
+    { pausasPorDia: store.get('pausasPorDia', {}), checkins: store.get('checkins', []) },
+    Date.now()
+  );
+  const win = openPainel(dados);
+  painelWin = win;
+  win.on('closed', () => {
+    if (painelWin === win) painelWin = null;
+  });
+}
+
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();
@@ -332,6 +355,17 @@ if (!gotLock) {
         if (win && !win.isDestroyed() && win !== lumiWin) win.close();
       });
 
+      ipcMain.on('abrir-painel', (e) => {
+        const win = BrowserWindow.fromWebContents(e.sender);
+        if (!win || win !== lumiWin || win.isDestroyed()) return;
+        abrirPainelSemanal();
+      });
+
+      ipcMain.on('painel-fechar', (e) => {
+        const win = BrowserWindow.fromWebContents(e.sender);
+        if (win && win === painelWin && !win.isDestroyed()) win.close();
+      });
+
       ipcMain.on('lumi-menu', (e) => {
         const win = BrowserWindow.fromWebContents(e.sender);
         if (!win || win !== lumiWin || win.isDestroyed()) return;
@@ -364,6 +398,7 @@ if (!gotLock) {
           },
           { label: 'Voltar ao normal', click: () => scheduler.silence(Date.now(), 0) },
           { type: 'separator' },
+          { label: 'Meu painel', click: () => abrirPainelSemanal() },
           {
             label: 'Recomeçar apresentação',
             click: () => {

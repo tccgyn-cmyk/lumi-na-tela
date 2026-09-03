@@ -83,6 +83,14 @@ lumiEl.addEventListener('contextmenu', (e) => {
   window.lumiAPI.openMenu();
 });
 
+// Clique esquerdo (fora de convite/check-in) abre o painel semanal
+lumiEl.addEventListener('click', () => {
+  const estado = lumiEl.dataset.state;
+  if (estado === 'idle' || estado === 'waving' || estado === 'talking') {
+    window.lumiAPI.abrirPainel();
+  }
+});
+
 // Estados vindos do processo principal
 window.lumiAPI.onState((s) => {
   ignoring = null; // main pinou/despinou por fora; força o próximo envio

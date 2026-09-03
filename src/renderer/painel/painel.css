@@ -1,0 +1,43 @@
+html, body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: #fdfbf2;
+  color: #3a3a3a;
+  user-select: none;
+}
+.painel {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: center;
+  box-sizing: border-box;
+  min-height: 100vh;
+  justify-content: center;
+}
+h1 { font-size: 18px; margin: 0; color: #3f9e94; }
+h2 { font-size: 13px; margin: 8px 0 0; color: #8a8a7a; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+.sequencia { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
+#seq-num { font-size: 42px; font-weight: 700; color: #e0a52e; }
+#seq-texto { font-size: 13px; }
+.barras { display: flex; align-items: flex-end; justify-content: center; gap: 8px; height: 90px; }
+.barra { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 34px; }
+.barra .coluna { width: 100%; background: #ffd75e; border-radius: 6px 6px 0 0; min-height: 3px; }
+.barra .rotulo { font-size: 10px; color: #8a8a7a; }
+.barra .valor { font-size: 11px; font-weight: 600; }
+.humor { display: flex; justify-content: center; gap: 8px; }
+.humor .dia { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 34px; }
+.humor .dia span { font-size: 15px; line-height: 1.2; }
+.humor .dia .rotulo { font-size: 10px; color: #8a8a7a; }
+.destaque { font-size: 13px; background: #e4f2ef; border-radius: 12px; padding: 10px 12px; margin: 6px 0 0; }
+#btn-fechar {
+  margin-top: 6px;
+  align-self: center;
+  border: none;
+  border-radius: 12px;
+  padding: 9px 22px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #ffe08a;
+}

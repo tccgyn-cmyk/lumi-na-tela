@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'" />
+  <title>Lumi — meu painel</title>
+  <link rel="stylesheet" href="painel.css" />
+</head>
+<body>
+  <div class="painel">
+    <h1>Sua semana com o Lumi</h1>
+    <div class="sequencia">
+      <span id="seq-num">0</span>
+      <span id="seq-texto">dias seguidos cuidando de você</span>
+    </div>
+    <h2>Pausas feitas</h2>
+    <div id="barras" class="barras"></div>
+    <h2>Como você chegou × saiu</h2>
+    <div id="humor" class="humor"></div>
+    <p id="destaque" class="destaque"></p>
+    <button id="btn-fechar">Fechar</button>
+  </div>
+  <script src="painel.js"></script>
+</body>
+</html>
