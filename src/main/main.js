@@ -61,6 +61,10 @@ let waving = false;
 let checkinAtivo = null; // âncora em andamento ('chegada'|'saida') ou null
 let checkinTimeout = null;
 
+// Até quando o balão está ocupado por uma fala (falinha/acolhimento).
+// Nenhum outro dono do balão pode assumir antes disso.
+let bolhaOcupadaAte = 0;
+
 function estadoDoDia() {
   const hoje = diaISO(Date.now());
   let dia = store.get('diaAtual', null);
@@ -121,6 +125,7 @@ function updateAttentionWave(idleSeconds) {
   if (checkinAtivo) return; // check-in ativo: o balão pertence a ele
   if (!lumiAlive() || currentTipo) return;
   if (Date.now() < walkUntil) return; // espera a travessia terminar
+  if (Date.now() < bolhaOcupadaAte) return;
   const foraDoExpediente = !dentroDoExpediente(Date.now(), perfil?.expediente);
   const shouldWave =
     !foraDoExpediente && idleSeconds >= WAVE_MIN_IDLE_S && idleSeconds < WAVE_MAX_IDLE_S;
@@ -141,14 +146,16 @@ function maybeFalinha(idleSeconds) {
   if (!dentroDoExpediente(Date.now(), perfil?.expediente)) return;
   const now = Date.now();
   if (now < walkUntil || now < nextFalinhaAt) return;
+  if (now < bolhaOcupadaAte) return;
   if (idleSeconds > 45) return; // só com a pessoa ali, ativa
   if (now < scheduler.silencedUntil) return; // em atendimento: silêncio total
   // Não puxa papo se um convite está a menos de 5 min de acontecer
   if (scheduler.intervalMs - scheduler.activeMs < 5 * 60_000) return;
   agendaProximaFalinha();
+  bolhaOcupadaAte = Date.now() + FALINHA_DURATION_MS;
   lumiWin.webContents.send('lumi-state', { state: 'talking', message: pickFalinha() });
   setTimeout(() => {
-    if (!currentTipo && lumiAlive()) {
+    if (!currentTipo && !checkinAtivo && lumiAlive()) {
       lumiWin.webContents.send('lumi-state', { state: 'idle' });
     }
   }, FALINHA_DURATION_MS);
@@ -160,6 +167,7 @@ function triggerIntervention() {
   if (currentTipo || !lumiAlive()) return;
   if (activityWin && !activityWin.isDestroyed()) return; // atividade em andamento
   if (!dentroDoExpediente(Date.now(), perfil?.expediente)) return;
+  if (Date.now() < bolhaOcupadaAte) return;
   currentTipo = rotation.next();
   store.set('rotacaoIndex', rotation.i);
   waving = false; // a travessia substitui o aceno; o tick seguinte reavalia
@@ -202,13 +210,17 @@ function maybeCheckin(idleSeconds) {
   if (activityWin && !activityWin.isDestroyed()) return;
   const now = Date.now();
   if (now < walkUntil) return;
+  if (now < bolhaOcupadaAte) return;
   if (idleSeconds > 45) return;
   if (now < scheduler.silencedUntil) return;
   if (!dentroDoExpediente(now, perfil?.expediente)) return;
   if (!perfil) return; // sem onboarding, sem check-in
 
   const dia = estadoDoDia();
-  if (dia.firstActiveMs === null && idleSeconds <= 45) {
+  // "Chegada" = primeira atividade ELEGÍVEL do dia (dentro do expediente,
+  // fora de silêncio): um plantão que começa em "Em atendimento" só marca
+  // a chegada quando o silêncio termina — comportamento intencional.
+  if (dia.firstActiveMs === null) {
     dia.firstActiveMs = now;
     store.set('diaAtual', dia);
   }
@@ -248,9 +260,10 @@ function finalizarCheckin(resp) {
       store.set('ultimoAcolhimento', Date.now());
       setTimeout(() => {
         if (lumiAlive() && !currentTipo && !checkinAtivo) {
+          bolhaOcupadaAte = Date.now() + 15_000;
           lumiWin.webContents.send('lumi-state', { state: 'talking', message: acolhimento });
           setTimeout(() => {
-            if (lumiAlive() && !currentTipo) {
+            if (lumiAlive() && !currentTipo && !checkinAtivo) {
               lumiWin.webContents.send('lumi-state', { state: 'idle' });
             }
           }, 14_000);
@@ -358,6 +371,7 @@ if (!gotLock) {
       ipcMain.on('abrir-painel', (e) => {
         const win = BrowserWindow.fromWebContents(e.sender);
         if (!win || win !== lumiWin || win.isDestroyed()) return;
+        if (!perfil || currentTipo || checkinAtivo) return;
         abrirPainelSemanal();
       });
 
@@ -393,6 +407,7 @@ if (!gotLock) {
               click: () => {
                 scheduler.silence(Date.now(), min);
                 handleResponse('dismiss');
+                finalizarCheckin({ skip: true });
               },
             })),
           },
@@ -402,12 +417,19 @@ if (!gotLock) {
           {
             label: 'Recomeçar apresentação',
             click: () => {
+              // Cancela qualquer estado em voo antes de recomeçar
+              handleResponse('dismiss'); // no-op se não há convite
+              finalizarCheckin({ skip: true }); // no-op se não há check-in
               perfil = null;
               store.set('perfil', null);
-              if (lumiAlive()) {
-                lumiWin.setIgnoreMouseEvents(false);
-                lumiWin.webContents.send('lumi-state', { state: 'onboarding' });
-              }
+              // Espera a volta ao canto terminar (walk ~1.8s) para o "idle"
+              // atrasado não engolir o balão do onboarding
+              setTimeout(() => {
+                if (!perfil && lumiAlive()) {
+                  lumiWin.setIgnoreMouseEvents(false);
+                  lumiWin.webContents.send('lumi-state', { state: 'onboarding' });
+                }
+              }, 2200);
             },
           },
           { type: 'separator' },
