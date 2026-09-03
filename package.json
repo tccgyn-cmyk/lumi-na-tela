@@ -48,7 +48,8 @@
       {
         "provider": "github",
         "owner": "tccgyn-cmyk",
-        "repo": "lumi-na-tela"
+        "repo": "lumi-na-tela",
+        "releaseType": "release"
       }
     ]
   }
