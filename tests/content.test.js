@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { microPausas, exercicios, convites, falinhas, pilulas, tagsCheckin, acolhimento, RODIZIO } from '../src/shared/content.js';
+import { microPausas, exercicios, convites, falinhas, pilulas, tagsCheckin, acolhimento, RODIZIO, produtos, ctas } from '../src/shared/content.js';
 
 describe('Conteúdo', () => {
   it('tem pelo menos 10 micro-pausas com titulo e texto', () => {
@@ -63,5 +63,32 @@ describe('Conteúdo', () => {
   it('tem tags de check-in e mensagem de acolhimento com CVV', () => {
     expect(tagsCheckin.length).toBeGreaterThanOrEqual(5);
     expect(acolhimento).toContain('188');
+  });
+
+  it('produtos tem nome e URL https', () => {
+    const chaves = Object.keys(produtos);
+    expect(chaves.length).toBeGreaterThanOrEqual(5);
+    for (const k of chaves) {
+      expect(produtos[k].nome).toBeTruthy();
+      expect(produtos[k].url.startsWith('https://')).toBe(true);
+    }
+  });
+
+  it('ctas suficientes, todos apontando para produtos existentes', () => {
+    expect(ctas.length).toBeGreaterThanOrEqual(8);
+    for (const c of ctas) {
+      expect(c.texto).toBeTruthy();
+      expect(produtos[c.produto]).toBeTruthy();
+    }
+    // Todo produto tem pelo menos um CTA
+    for (const k of Object.keys(produtos)) {
+      expect(ctas.some((c) => c.produto === k)).toBe(true);
+    }
+  });
+
+  it('paginas proprias levam utm_source=lumi', () => {
+    for (const k of ['metodo', 'dortotal', 'convidado']) {
+      expect(produtos[k].url).toContain('utm_source=lumi');
+    }
   });
 });

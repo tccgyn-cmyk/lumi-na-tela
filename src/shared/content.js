@@ -176,4 +176,44 @@ const acolhimento =
 // main.js e os testes derivam daqui — nunca duplicar esta lista.
 const RODIZIO = ['micro-pausa', 'respiracao', 'micro-pausa', 'pilula'];
 
-module.exports = { microPausas, exercicios, convites, falinhas, pilulas, tagsCheckin, acolhimento, RODIZIO };
+// Funil PsicoLabs — links fornecidos pelo Roberto em 2026-09-03.
+// O app SÓ abre URLs deste mapa (allowlist). ConectaDig entra quando houver URL.
+const UTM = 'utm_source=lumi&utm_medium=app&utm_content=cta';
+const produtos = {
+  metodo: {
+    nome: 'Método Arquitetura do Encontro Hospitalar',
+    url: `https://www.encontrohospitalar.com.br/?${UTM}`,
+  },
+  dortotal: {
+    nome: 'Dor Total 360º',
+    url: `https://dortotal360.pages.dev/?${UTM}`,
+  },
+  convidado: {
+    nome: 'O Convidado Indesejado — A Dor',
+    url: `https://convidado-indesejado.netlify.app/?${UTM}`,
+  },
+  livro: {
+    nome: 'A Vida em um Corpo que Ensina',
+    url: 'https://a.co/d/0ejWHMGV', // link curto Amazon: não aceita UTM
+  },
+  instagram: {
+    nome: '@robertoribeiropsi',
+    url: 'https://www.instagram.com/robertoribeiropsi/',
+  },
+};
+
+// TODO: TODO TEXTO PASSA PELA APROVAÇÃO DO ROBERTO ANTES DO LANÇAMENTO
+const ctas = [
+  { produto: 'metodo', texto: 'Sabia que comunicar notícias difíceis é técnica que se aprende? O Roberto criou um método pra isso. Quer ver? 👀' },
+  { produto: 'metodo', texto: 'Se a conversa difícil com paciente ainda dá frio na barriga, o Método Arquitetura do Encontro Hospitalar é pra você.' },
+  { produto: 'dortotal', texto: 'Dor não é só física. O Dor Total 360º mostra as dimensões que a gente esquece de olhar.' },
+  { produto: 'dortotal', texto: 'Quer enxergar a dor do seu paciente por inteiro? Dá uma olhada no Dor Total 360º.' },
+  { produto: 'convidado', texto: 'A dor chega sem ser convidada. "O Convidado Indesejado" ajuda você (e seu paciente) a recebê-la melhor.' },
+  { produto: 'convidado', texto: 'Tem um material do Roberto sobre conviver com a dor que vale cada minuto. Topa conhecer?' },
+  { produto: 'livro', texto: 'Já leu "A Vida em um Corpo que Ensina"? É o livro do Roberto — pra quem cuida e também sente. 📖' },
+  { produto: 'livro', texto: 'Um livro sobre o que o corpo ensina quando a vida aperta, escrito por quem viveu o hospital por dentro.' },
+  { produto: 'instagram', texto: 'Curte as minhas pílulas? O Instagram do Roberto tem muito mais: @robertoribeiropsi 💛' },
+  { produto: 'instagram', texto: 'Conteúdo showww sobre saúde e humanização no @robertoribeiropsi. Segue lá!' },
+];
+
+module.exports = { microPausas, exercicios, convites, falinhas, pilulas, tagsCheckin, acolhimento, RODIZIO, produtos, ctas };
