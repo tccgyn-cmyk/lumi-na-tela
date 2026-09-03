@@ -10,13 +10,11 @@ on:
 permissions:
   contents: write
 
+# Builds em sequência (Windows cria a Release; o Mac anexa nela) para
+# evitar a corrida que gerava dois rascunhos duplicados.
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+  build-windows:
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,7 +22,22 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npm test
-      - name: Build e publicar instalador
+      - name: Build e publicar instalador Windows
+        run: npx electron-builder --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-mac:
+    needs: build-windows
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm test
+      - name: Build e publicar instalador macOS (universal)
         run: npx electron-builder --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

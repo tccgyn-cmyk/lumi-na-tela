@@ -1,6 +1,6 @@
 {
   "name": "lumi-na-tela",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Lumi — seu companheiro de saúde mental na tela (PsicoLabs)",
   "main": "src/main/main.js",
   "repository": "github:tccgyn-cmyk/lumi-na-tela",
@@ -40,7 +40,14 @@
       "deleteAppDataOnUninstall": false
     },
     "mac": {
-      "target": "dmg",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
       "icon": "build/icon.png",
       "category": "public.app-category.healthcare-fitness"
     },
