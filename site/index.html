@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lumi na Tela — quem cuida de você enquanto você cuida de todo mundo?</title>
+  <meta name="description" content="Um companheiro de saúde mental que mora na sua tela: pausas inteligentes, respiração guiada e check-in emocional para profissionais de saúde. Grátis, do PsicoLabs." />
+  <link rel="icon" href="img/idle.png" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" />
+  <style>
+    :root {
+      --creme: #fbf6e9;
+      --papel: #ffffff;
+      --tinta: #33302a;
+      --tinta-suave: #6d675c;
+      --ouro: #e9a93c;
+      --ouro-escuro: #c78415;
+      --ouro-suave: #fdedc6;
+      --verde: #3f9e94;
+      --verde-escuro: #2a5a54;
+      --verde-suave: #e0f1ee;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--creme);
+      color: var(--tinta);
+      font-family: "Atkinson Hyperlegible", "Segoe UI", sans-serif;
+      font-size: 17px;
+      line-height: 1.6;
+    }
+    h1, h2, h3 { font-family: "Baloo 2", sans-serif; color: var(--verde-escuro); text-wrap: balance; line-height: 1.15; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+
+    /* ===== Hero ===== */
+    .hero {
+      background: linear-gradient(180deg, #fff8e4 0%, var(--creme) 100%);
+      padding: 56px 0 40px;
+    }
+    .hero-grid {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .hero-texto { flex: 1 1 420px; }
+    .hero-lumi { flex: 0 1 260px; text-align: center; }
+    .hero-lumi img {
+      height: 300px;
+      filter: drop-shadow(0 0 24px rgba(255, 200, 60, 0.55)) drop-shadow(0 8px 18px rgba(90, 60, 0, 0.25));
+      animation: respirar 4.5s ease-in-out infinite;
+    }
+    @keyframes respirar {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.035); }
+    }
+    @media (prefers-reduced-motion: reduce) { .hero-lumi img { animation: none; } }
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--ouro-escuro);
+      margin: 0 0 10px;
+    }
+    h1 { font-size: clamp(2rem, 5vw, 3rem); margin: 0 0 14px; }
+    .hero p.sub { font-size: 1.15rem; color: var(--tinta-suave); margin: 0 0 24px; max-width: 34em; }
+    .cta-botao {
+      display: inline-block;
+      background: var(--ouro);
+      color: #2d2005;
+      font-family: "Baloo 2", sans-serif;
+      font-weight: 700;
+      font-size: 1.15rem;
+      padding: 14px 32px;
+      border-radius: 999px;
+      text-decoration: none;
+      box-shadow: 0 6px 18px rgba(201, 141, 26, 0.4);
+      transition: transform 0.15s ease;
+    }
+    .cta-botao:hover { transform: translateY(-2px); }
+    .cta-nota { font-size: 0.9rem; color: var(--tinta-suave); margin-top: 10px; }
+
+    /* ===== Faixas ===== */
+    section { padding: 56px 0; }
+    section.alt { background: var(--papel); }
+    h2 { font-size: clamp(1.5rem, 3.5vw, 2rem); margin: 0 0 8px; }
+    .secao-sub { color: var(--tinta-suave); margin: 0 0 32px; max-width: 40em; }
+
+    /* Como funciona */
+    .passos { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .passo { background: var(--papel); border-radius: 16px; padding: 22px; }
+    section.alt .passo { background: var(--creme); }
+    .passo .num {
+      display: inline-flex;
+      width: 34px; height: 34px;
+      align-items: center; justify-content: center;
+      background: var(--verde);
+      color: #fff;
+      border-radius: 50%;
+      font-family: "Baloo 2", sans-serif;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .passo h3 { margin: 0 0 6px; font-size: 1.1rem; }
+    .passo p { margin: 0; color: var(--tinta-suave); font-size: 0.98rem; }
+
+    /* O que ele faz */
+    .recursos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .recurso {
+      display: flex; gap: 14px;
+      background: var(--creme);
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .recurso .emoji { font-size: 1.6rem; line-height: 1; }
+    .recurso h3 { margin: 0 0 4px; font-size: 1.05rem; }
+    .recurso p { margin: 0; color: var(--tinta-suave); font-size: 0.95rem; }
+
+    /* Poses */
+    .poses { display: flex; justify-content: center; gap: 8vw; flex-wrap: wrap; margin-top: 36px; }
+    .pose { text-align: center; color: var(--tinta-suave); font-size: 0.88rem; }
+    .pose img { height: 110px; filter: drop-shadow(0 4px 10px rgba(90, 60, 0, 0.25)); }
+
+    /* Privacidade + números */
+    .selo {
+      background: var(--verde-suave);
+      border-left: 5px solid var(--verde);
+      border-radius: 0 14px 14px 0;
+      padding: 18px 22px;
+      max-width: 44em;
+    }
+    .numeros { display: flex; gap: 40px; flex-wrap: wrap; margin-top: 28px; }
+    .numero .grande {
+      font-family: "Baloo 2", sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--ouro-escuro);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .numero .rotulo { color: var(--tinta-suave); font-size: 0.92rem; max-width: 14em; }
+
+    /* Formulário */
+    .form-caixa {
+      background: var(--papel);
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 480px;
+      margin: 0 auto;
+      box-shadow: 0 12px 40px rgba(90, 60, 0, 0.12);
+    }
+    .form-caixa h2 { text-align: center; }
+    .form-caixa p { text-align: center; color: var(--tinta-suave); margin-top: 0; }
+    form { display: flex; flex-direction: column; gap: 12px; }
+    label { font-weight: 700; font-size: 0.9rem; }
+    input[type="text"], input[type="email"] {
+      border: 2px solid var(--verde-suave);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: var(--creme);
+      color: var(--tinta);
+    }
+    input:focus { outline: 3px solid var(--ouro-suave); border-color: var(--ouro); }
+    button.cta-botao { border: none; cursor: pointer; width: 100%; }
+    .oculto { display: none; }
+
+    footer {
+      background: var(--verde-escuro);
+      color: #dff0ec;
+      padding: 32px 0;
+      font-size: 0.92rem;
+    }
+    footer a { color: #ffe08a; text-decoration: none; }
+    footer .container { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    a:focus-visible, button:focus-visible { outline: 3px solid var(--ouro); outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="container hero-grid">
+      <div class="hero-texto">
+        <p class="eyebrow">Grátis · Windows e Mac · PsicoLabs</p>
+        <h1>Quem cuida de você enquanto você cuida de todo mundo?</h1>
+        <p class="sub">O Lumi é uma criaturinha de luz que mora no canto da sua tela. Entre um paciente e outro, ele lembra você de respirar, alongar, beber água — e pergunta, de verdade, como você está.</p>
+        <a class="cta-botao" href="#baixar">Quero o Lumi na minha tela 💛</a>
+        <p class="cta-nota">Feito para estudantes e profissionais de saúde. Sem cadastro, sem cartão, sem pegadinha.</p>
+      </div>
+      <div class="hero-lumi">
+        <img src="img/idle.png" alt="Lumi, uma criaturinha de luz dourada com jaleco verde-água, segurando um coração" />
+      </div>
+    </div>
+  </header>
+
+  <section class="alt">
+    <div class="container">
+      <h2>O plantão não para. Você precisa parar.</h2>
+      <p class="secao-sub">Prontuário, evolução, mais um paciente, mais um caso difícil… e quando você percebe, passou o dia inteiro sem um gole de água. O Lumi existe para quebrar esse ciclo — do jeito mais gentil possível.</p>
+      <div class="passos">
+        <div class="passo"><span class="num">1</span><h3>Ele mora na sua tela</h3><p>Fica quietinho no canto, respirando e piscando, sem atrapalhar nada — os cliques passam através dele.</p></div>
+        <div class="passo"><span class="num">2</span><h3>Ele percebe seu ritmo</h3><p>Depois de um tempão de trabalho contínuo, ele atravessa a tela nadando e convida: "bora dar uma pausinha?"</p></div>
+        <div class="passo"><span class="num">3</span><h3>2% do seu dia</h3><p>Micro-pausas de 30s a 3 min. Somando tudo, menos de 12 minutos num plantão de 8 horas.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <h2>O que o Lumi faz por você</h2>
+      <p class="secao-sub">Tudo baseado em ACT, DBT e TCC — ciência de verdade, com carinha fofa.</p>
+      <div class="recursos">
+        <div class="recurso"><span class="emoji">🫁</span><div><h3>Respiração guiada</h3><p>Diafragmática, 4-7-8, grounding 5-4-3-2-1 — e o Lumi respira junto com você.</p></div></div>
+        <div class="recurso"><span class="emoji">🤸</span><div><h3>Micro-pausas físicas</h3><p>Alongar, hidratar, olhar para longe. O corpo que cuida também é instrumento de trabalho.</p></div></div>
+        <div class="recurso"><span class="emoji">💛</span><div><h3>Check-in emocional</h3><p>Na chegada e no fim do dia: "como você tá?" — 15 segundos que viram autoconhecimento.</p></div></div>
+        <div class="recurso"><span class="emoji">📊</span><div><h3>Painel da semana</h3><p>Suas pausas, seu humor chegada × saída e sua sequência de dias se cuidando.</p></div></div>
+        <div class="recurso"><span class="emoji">💊</span><div><h3>Pílulas de psicoeducação</h3><p>Dicas curtas de quem viveu 13 anos de hospital por dentro — compartilháveis nos stories.</p></div></div>
+        <div class="recurso"><span class="emoji">🤫</span><div><h3>Respeita seu atendimento</h3><p>Modo "Em atendimento" com 1 clique, silêncio em apresentações e fora do seu expediente.</p></div></div>
+      </div>
+      <div class="poses">
+        <div class="pose"><img src="img/respira.png" alt="Lumi de olhos fechados, respirando" /><br />respira junto</div>
+        <div class="pose"><img src="img/acena.png" alt="Lumi acenando" /><br />chama você com carinho</div>
+        <div class="pose"><img src="img/comemora.png" alt="Lumi comemorando de braços abertos" /><br />comemora sua sequência</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt">
+    <div class="container">
+      <h2>Seus dados são só seus. Literalmente.</h2>
+      <div class="selo">
+        <strong>O Lumi não te vigia.</strong> Tudo que você registra — humor, pausas, nome — fica salvo apenas no seu computador. Nada sobe para a internet, nada é vendido, nada é analisado. É autocuidado, não é rastreamento.
+      </div>
+      <div class="numeros">
+        <div class="numero"><div class="grande">13 anos</div><div class="rotulo">de coordenação de psicologia hospitalar por trás do método</div></div>
+        <div class="numero"><div class="grande">300+</div><div class="rotulo">estagiários formados por Roberto Ribeiro, criador do Lumi</div></div>
+        <div class="numero"><div class="grande">R$ 0</div><div class="rotulo">é o que o Lumi custa. Cuidar de quem cuida não deveria ter barreira.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="baixar">
+    <div class="container">
+      <div class="form-caixa">
+        <h2>Leve o Lumi pra sua tela</h2>
+        <p>Deixa seu nome e e-mail que a gente te leva direto pro download — e te avisa das novidades do Lumi (sem spam, prometido).</p>
+        <form name="download-lumi" method="POST" action="/obrigado.html" data-netlify="true" netlify-honeypot="empresa">
+          <input type="hidden" name="form-name" value="download-lumi" />
+          <p class="oculto"><label>Não preencha: <input name="empresa" /></label></p>
+          <label for="nome">Seu nome</label>
+          <input type="text" id="nome" name="nome" required autocomplete="name" placeholder="Como o Lumi pode te chamar?" />
+          <label for="email">Seu melhor e-mail</label>
+          <input type="email" id="email" name="email" required autocomplete="email" placeholder="voce@exemplo.com" />
+          <button type="submit" class="cta-botao">Baixar o Lumi grátis 🚀</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div>
+        <strong>Lumi na Tela</strong> · um projeto <a href="https://www.psicolabsoficial.com" rel="noopener">PsicoLabs</a><br />
+        Feito com 💛 por Roberto Ribeiro — Goiânia, GO
+      </div>
+      <div>
+        <a href="https://www.instagram.com/robertoribeiropsi/" rel="noopener">@robertoribeiropsi</a><br />
+        <span style="opacity:0.8">O Lumi é autocuidado — não substitui terapia. Se precisar, procure ajuda: CVV 188.</span>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,3 @@
+# Netlify: publica a pasta site/ como landing page do Lumi
+[build]
+  publish = "site"
