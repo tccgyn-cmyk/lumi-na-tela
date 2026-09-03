@@ -44,7 +44,7 @@ Fora do escopo: landing page de download (sub-projeto), instaladores/GitHub (Fas
 ## 3. Conteúdo remoto
 
 - No arranque (e a cada 24h com o app aberto), o app tenta baixar `conteudo.json` de uma URL configurável.
-- Chaves atualizáveis remotamente: `falinhas`, `pilulas`, `microPausas`, `convites`, `ctas`. Estrutura validada antes de aplicar; inválida = ignorada.
+- Chaves atualizáveis remotamente: `falinhas`, `pilulas`, `microPausas`, `ctas` (os `convites` são estruturais — acoplados ao rodízio — e ficam embutidos). Estrutura validada antes de aplicar; inválida = ignorada.
 - Última versão válida fica em cache local; sem internet ou sem URL configurada, o conteúdo embutido funciona 100%.
 - URL padrão: vazia (mecanismo desligado) até a Fase 5 definir a hospedagem (GitHub raw, gratuito).
 
