@@ -355,6 +355,25 @@ function finalizarCheckin(resp) {
   }
 }
 
+// Auto-update via GitHub Releases: só no app empacotado, e qualquer falha
+// (repositório ainda não publicado, sem internet) é silenciosa — o app
+// nunca depende do update para funcionar.
+function iniciarAutoUpdate() {
+  if (!app.isPackaged) return;
+  try {
+    const { autoUpdater } = require('electron-updater');
+    autoUpdater.on('error', (err) => {
+      console.error('[lumi] auto-update:', (err && err.message) || err);
+    });
+    autoUpdater.checkForUpdatesAndNotify().catch(() => {});
+    setInterval(() => {
+      autoUpdater.checkForUpdatesAndNotify().catch(() => {});
+    }, 4 * 60 * 60_000);
+  } catch (err) {
+    console.error('[lumi] auto-update indisponível:', (err && err.message) || err);
+  }
+}
+
 function abrirPainelSemanal() {
   if (painelWin && !painelWin.isDestroyed()) {
     painelWin.focus();
@@ -390,6 +409,7 @@ if (!gotLock) {
       }
 
       iniciarConteudoRemoto();
+      iniciarAutoUpdate();
 
       lumiWin.webContents.once('did-finish-load', () => {
         if (!perfil && lumiAlive()) {

@@ -7,10 +7,42 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "electron .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "dist": "electron-builder --win nsis",
+    "dist:mac": "electron-builder --mac dmg"
   },
   "devDependencies": {
     "electron": "^33.0.0",
+    "electron-builder": "^26.0.0",
     "vitest": "^2.1.0"
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.0"
+  },
+  "build": {
+    "appId": "br.com.psicolabs.lumi",
+    "productName": "Lumi na Tela",
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": true,
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "build/icon.png",
+      "category": "public.app-category.healthcare-fitness"
+    },
+    "publish": null
   }
 }
