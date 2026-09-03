@@ -62,6 +62,8 @@ Regras:
 
 ## 6. Supressão em tela cheia
 
+> **Decisão do Roberto (2026-09-03):** a supressão vale apenas para tela cheia REAL (apresentação, vídeo). Janela maximizada — incluindo teleconsulta — NÃO suprime; o caminho é o botão "Em atendimento" (1 clique). Detecção de apps de vídeo (Zoom/Meet/Teams) fica como evolução futura.
+
 - A cada tick, o app detecta se a janela em foco está em tela cheia (apresentação, vídeo, teleconsulta maximizada).
 - Em tela cheia: Lumi fica invisível, convites/falinhas/check-ins são segurados (contam como adiados, não perdidos); ao sair, volta com folga de ~1 min.
 
