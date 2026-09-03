@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('lumiAPI', {
   respond: (answer) => ipcRenderer.send('intervention-response', answer),
   onboardingDone: (perfil) => ipcRenderer.send('onboarding-done', perfil),
   checkinResponder: (resp) => ipcRenderer.send('checkin-response', resp),
+  ctaResponder: (resp) => ipcRenderer.send('cta-response', resp),
   abrirPainel: () => ipcRenderer.send('abrir-painel'),
   onState: (cb) => ipcRenderer.on('lumi-state', (_e, s) => cb(s)),
 });

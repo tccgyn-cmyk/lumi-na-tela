@@ -2,6 +2,7 @@ const lumiEl = document.getElementById('lumi');
 const bubble = document.getElementById('bubble');
 const bubbleText = document.getElementById('bubble-text');
 const bubbleActions = document.getElementById('bubble-actions');
+const ctaActions = document.getElementById('cta-actions');
 const spriteEl = document.getElementById('lumi-sprite');
 
 // Poses do personagem (imagens reais) por estado
@@ -105,14 +106,22 @@ window.lumiAPI.onState((s) => {
     bubbleText.textContent = s.message || '';
     bubble.classList.remove('hidden');
     bubbleActions.classList.remove('hidden');
+    ctaActions.classList.add('hidden');
   } else if (s.state === 'talking') {
     // Falinha: balão sem botões, o main esconde sozinho depois de uns segundos
     bubbleText.textContent = s.message || '';
     bubble.classList.remove('hidden');
     bubbleActions.classList.add('hidden');
+    ctaActions.classList.add('hidden');
+  } else if (s.state === 'cta') {
+    bubbleText.textContent = s.message || '';
+    bubble.classList.remove('hidden');
+    bubbleActions.classList.add('hidden');
+    ctaActions.classList.remove('hidden');
   } else {
     bubble.classList.add('hidden');
     bubbleActions.classList.add('hidden');
+    ctaActions.classList.add('hidden');
   }
 });
 
@@ -120,8 +129,13 @@ document.getElementById('btn-accept').addEventListener('click', () => window.lum
 document.getElementById('btn-snooze').addEventListener('click', () => window.lumiAPI.respond('snooze'));
 document.getElementById('btn-dismiss').addEventListener('click', () => window.lumiAPI.respond('dismiss'));
 
-// Janela pinada interativa durante o convite: clique fora do Lumi/balão dispensa
+document.getElementById('btn-cta-ver').addEventListener('click', () => window.lumiAPI.ctaResponder('ver'));
+document.getElementById('btn-cta-nao').addEventListener('click', () => window.lumiAPI.ctaResponder('nao'));
+
+// Janela pinada interativa durante o convite/CTA: clique fora do Lumi/balão dispensa
 document.addEventListener('mousedown', (e) => {
   const inside = e.target instanceof Element && e.target.closest('#lumi, #bubble');
-  if (!inside && lumiEl.dataset.state === 'invite') window.lumiAPI.respond('dismiss');
+  if (inside) return;
+  if (lumiEl.dataset.state === 'invite') window.lumiAPI.respond('dismiss');
+  else if (lumiEl.dataset.state === 'cta') window.lumiAPI.ctaResponder('nao');
 });

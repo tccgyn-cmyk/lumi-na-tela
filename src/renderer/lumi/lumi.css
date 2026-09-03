@@ -132,6 +132,10 @@ html, body {
   background: #ffe08a;
   font-weight: 600;
 }
+#cta-actions #btn-cta-ver {
+  background: #ffe08a;
+  font-weight: 600;
+}
 .hidden { display: none !important; }
 
 /* Onboarding */

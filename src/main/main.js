@@ -1,5 +1,5 @@
 const path = require('path');
-const { app, BrowserWindow, ipcMain, Menu, powerMonitor } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, powerMonitor, shell } = require('electron');
 const { createLumiWindow } = require('./lumi-window');
 const { openActivity } = require('./activity-window');
 const { openPainel } = require('./painel-window');
@@ -11,8 +11,17 @@ const { createStore } = require('./store');
 const { dentroDoExpediente } = require('./expediente');
 const { ancoraDevida, precisaAcolher } = require('./checkin-rules');
 const { checarTelaCheia } = require('./fullscreen');
+const { ctaDevido } = require('./cta-rules');
 const { diaISO } = require('../shared/dias');
-const { convites, falinhas, RODIZIO, tagsCheckin, acolhimento } = require('../shared/content');
+const {
+  convites,
+  falinhas,
+  RODIZIO,
+  tagsCheckin,
+  acolhimento,
+  produtos,
+  ctas,
+} = require('../shared/content');
 
 const TICK_MS = 5000;
 const INVITE_TIMEOUT_MS = 2 * 60_000;
@@ -61,6 +70,10 @@ let waving = false;
 
 let checkinAtivo = null; // âncora em andamento ('chegada'|'saida') ou null
 let checkinTimeout = null;
+
+let ctaAtivo = null; // chave do produto em exibição
+let ctaTimeout = null;
+const CTA_DURATION_MS = 25_000;
 
 let emTelaCheia = false;
 let checandoTelaCheia = false;
@@ -128,6 +141,7 @@ function pick(list) {
 function updateAttentionWave(idleSeconds) {
   if (!perfil) return; // onboarding ativo: o balão pertence a ele
   if (checkinAtivo) return; // check-in ativo: o balão pertence a ele
+  if (ctaAtivo) return; // CTA ativo: o balão pertence a ele
   if (!lumiAlive() || currentTipo) return;
   if (Date.now() < walkUntil) return; // espera a travessia terminar
   if (Date.now() < bolhaOcupadaAte) return;
@@ -146,6 +160,7 @@ function updateAttentionWave(idleSeconds) {
 function maybeFalinha(idleSeconds) {
   if (!perfil) return; // onboarding ativo: o balão pertence a ele
   if (checkinAtivo) return; // check-in ativo: o balão pertence a ele
+  if (ctaAtivo) return; // CTA ativo: o balão pertence a ele
   if (!lumiAlive() || currentTipo || waving) return;
   if (activityWin && !activityWin.isDestroyed()) return;
   if (!dentroDoExpediente(Date.now(), perfil?.expediente)) return;
@@ -166,9 +181,60 @@ function maybeFalinha(idleSeconds) {
   }, FALINHA_DURATION_MS);
 }
 
+// LUMI_DEV_CTA=1 ignora a cadência (para testar)
+function maybeCta(idleSeconds) {
+  if (!perfil || !lumiAlive() || currentTipo || checkinAtivo || waving || ctaAtivo) return;
+  if (activityWin && !activityWin.isDestroyed()) return;
+  const now = Date.now();
+  if (now < walkUntil || now < bolhaOcupadaAte) return;
+  if (idleSeconds > 45) return;
+  if (now < scheduler.silencedUntil) return;
+  if (!dentroDoExpediente(now, perfil?.expediente)) return;
+  if (scheduler.intervalMs - scheduler.activeMs < 5 * 60_000) return;
+  if (
+    process.env.LUMI_DEV_CTA !== '1' &&
+    !ctaDevido(now, {
+      primeiroDiaUso: store.get('primeiroDiaUso', null),
+      ultimoCtaMs: store.get('ultimoCtaMs', 0),
+    })
+  ) {
+    return;
+  }
+  const ultimo = store.get('ultimoCtaProduto', null);
+  const opcoes = ctas.filter((c) => c.produto !== ultimo);
+  const cta = pick(opcoes.length ? opcoes : ctas);
+  ctaAtivo = cta.produto;
+  store.set('ultimoCtaMs', now);
+  store.set('ultimoCtaProduto', cta.produto);
+  bolhaOcupadaAte = now + CTA_DURATION_MS + 1000;
+  lumiWin.setIgnoreMouseEvents(false); // botões do CTA precisam de clique
+  lumiWin.webContents.send('lumi-state', { state: 'cta', message: cta.texto });
+  ctaTimeout = setTimeout(() => finalizarCta('timeout'), CTA_DURATION_MS);
+}
+
+function finalizarCta(resp) {
+  if (!ctaAtivo) return;
+  const produto = ctaAtivo;
+  ctaAtivo = null;
+  clearTimeout(ctaTimeout);
+  ctaTimeout = null;
+  bolhaOcupadaAte = 0;
+  if (resp === 'ver' && produtos[produto]) {
+    // Allowlist: só URLs do mapa embutido chegam aqui
+    shell.openExternal(produtos[produto].url).catch((err) => {
+      console.error('[lumi] falha ao abrir link', err);
+    });
+  }
+  if (lumiAlive()) {
+    lumiWin.setIgnoreMouseEvents(true, { forward: true });
+    lumiWin.webContents.send('lumi-state', { state: 'idle' });
+  }
+}
+
 function triggerIntervention() {
   if (!perfil) return false; // onboarding ativo: o balão pertence a ele
   if (checkinAtivo) return false; // check-in ativo: o balão pertence a ele
+  if (ctaAtivo) return false; // CTA ativo: o balão pertence a ele
   if (currentTipo || !lumiAlive()) return false;
   if (activityWin && !activityWin.isDestroyed()) return false; // atividade em andamento
   if (!dentroDoExpediente(Date.now(), perfil?.expediente)) return false;
@@ -212,7 +278,7 @@ function handleResponse(answer) {
 }
 
 function maybeCheckin(idleSeconds) {
-  if (!lumiAlive() || currentTipo || checkinAtivo || waving) return;
+  if (!lumiAlive() || currentTipo || checkinAtivo || waving || ctaAtivo) return;
   if (activityWin && !activityWin.isDestroyed()) return;
   const now = Date.now();
   if (now < walkUntil) return;
@@ -314,6 +380,10 @@ if (!gotLock) {
         lumiWin = null;
       });
 
+      if (!store.get('primeiroDiaUso', null)) {
+        store.set('primeiroDiaUso', diaISO(Date.now()));
+      }
+
       lumiWin.webContents.once('did-finish-load', () => {
         if (!perfil && lumiAlive()) {
           lumiWin.setIgnoreMouseEvents(false); // pinada durante o onboarding
@@ -327,6 +397,7 @@ if (!gotLock) {
           if (currentTipo) return; // convite ativo: janela pinada interativa
           if (!perfil) return; // onboarding ativo: janela pinada
           if (checkinAtivo) return; // check-in ativo: janela pinada interativa
+          if (ctaAtivo) return; // CTA ativo: janela pinada interativa
           win.setIgnoreMouseEvents(Boolean(ignore), { forward: true });
         }
       });
@@ -361,6 +432,12 @@ if (!gotLock) {
         const win = BrowserWindow.fromWebContents(e.sender);
         if (!win || win !== lumiWin || win.isDestroyed()) return;
         finalizarCheckin(resp || { skip: true });
+      });
+
+      ipcMain.on('cta-response', (e, resp) => {
+        const win = BrowserWindow.fromWebContents(e.sender);
+        if (!win || win !== lumiWin || win.isDestroyed()) return;
+        finalizarCta(resp === 'ver' ? 'ver' : 'nao');
       });
 
       ipcMain.on('intervention-response', (e, answer) => {
@@ -414,6 +491,7 @@ if (!gotLock) {
                 scheduler.silence(Date.now(), min);
                 handleResponse('dismiss');
                 finalizarCheckin({ skip: true });
+                finalizarCta('nao');
               },
             })),
           },
@@ -426,6 +504,7 @@ if (!gotLock) {
               // Cancela qualquer estado em voo antes de recomeçar
               handleResponse('dismiss'); // no-op se não há convite
               finalizarCheckin({ skip: true }); // no-op se não há check-in
+              finalizarCta('nao'); // no-op se não há CTA
               perfil = null;
               store.set('perfil', null);
               // Espera a volta ao canto terminar (walk ~1.8s) para o "idle"
@@ -472,6 +551,7 @@ if (!gotLock) {
         updateAttentionWave(idleSeconds);
         maybeFalinha(idleSeconds);
         maybeCheckin(idleSeconds);
+        maybeCta(idleSeconds);
       }, TICK_MS);
     })
     .catch((err) => {
