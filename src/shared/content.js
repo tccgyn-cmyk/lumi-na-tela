@@ -86,6 +86,12 @@ const convites = {
     'Momento Lumi: vamos baixar a rotação um pouquinho? Topa?',
     'Uns minutinhos pra cuidar da mente? Eu te guio, é rapidinho.',
   ],
+  pilula: [
+    'Tenho uma dica rapidinha do Roberto pra você. Quer ver?',
+    'Pílula do Lumi: 30 segundos de conhecimento que cuida. Bora?',
+    'Aprendi uma coisa boa com o Roberto. Te conto?',
+    'Hora de uma pílula de psicoeducação. É rapidinho, topa?',
+  ],
 };
 
 // Falinhas: conversa espontânea do Lumi (balão sem botões, some sozinho).
@@ -123,4 +129,45 @@ const falinhas = [
   { texto: 'Café é combustível, mas pausa é manutenção. ⛽' },
 ];
 
-module.exports = { microPausas, exercicios, convites, falinhas };
+// Pílulas de psicoeducação — ACT, DBT, TCC e autocuidado do profissional
+// de saúde. TODO TEXTO PASSA PELA APROVAÇÃO DO ROBERTO ANTES DO LANÇAMENTO.
+// Assinatura (@robertoribeiropsi) é adicionada pela UI, não pelo texto.
+const pilulas = [
+  { id: 'descompressao', titulo: 'Fechar o capítulo', texto: 'Entre um paciente e outro, 3 respirações conscientes já dizem pro teu corpo: "esse capítulo fechou". Isso é regulação, não frescura.' },
+  { id: 'nome-emocao', titulo: 'Nomear acalma', texto: 'Nomear o que você sente ("isso é frustração") reduz a intensidade da emoção. A ciência chama de rotulagem afetiva. Testa no próximo plantão.' },
+  { id: 'defusao', titulo: 'Pensamento não é fato', texto: '"Eu sou incompetente" é só uma frase que a mente produz no cansaço. Nota, agradece a mente e segue. Isso é defusão, direto da ACT.' },
+  { id: 'valores', titulo: 'Bússola de valores', texto: 'Dia pesado? Lembra POR QUE você escolheu a saúde. Agir guiado por valores, mesmo cansado, é o que a ACT chama de vida com sentido.' },
+  { id: 'autocompaixao', titulo: 'Fala contigo direito', texto: 'Você falaria com um colega do jeito que fala com você mesmo quando erra? Autocompaixão não é moleza — é o que sustenta carreira longa.' },
+  { id: 'limites', titulo: 'Dizer não é técnica', texto: 'Dizer "não consigo agora" é habilidade clínica. Quem não aprende a dizer não, um dia o corpo diz por ele.' },
+  { id: 'freio-fisiologico', titulo: 'Freio de mão do corpo', texto: 'Expirar mais longo do que inspirar ativa o freio do corpo (o parassimpático). 4 segundos entrando, 6 saindo. Farmacologia gratuita.' },
+  { id: 'pequenas-vitorias', titulo: 'O viés do fim do dia', texto: 'Teu cérebro registra melhor o que deu errado — é viés, não verdade. Antes de sair, nomeia 1 coisa que deu certo hoje.' },
+  { id: 'corpo-instrumento', titulo: 'Manutenção do instrumento', texto: 'Na saúde, teu corpo é teu instrumento de trabalho. Hidratar, alongar e pausar é manutenção de equipamento, não luxo.' },
+  { id: 'presenca', titulo: '30 segundos de presença', texto: 'Escuta de qualidade não exige mais tempo — exige presença. Meio minuto de atenção plena antes de entrar no quarto muda o encontro.' },
+  { id: 'ruminacao', titulo: 'Horário de preocupação', texto: 'Levando o plantão pra casa na cabeça? Marca um "horário de preocupação" de 15 min. Fora dele, devolve o pensamento pra lá. TCC pura.' },
+  { id: 'validacao', titulo: 'Validar não é concordar', texto: 'Validar é dizer "faz sentido você sentir isso". Funciona com paciente, com colega — e com você mesmo. Presente da DBT.' },
+  { id: 'perfeccionismo', titulo: 'Bom o suficiente', texto: '"Bom o suficiente" salva mais vidas que "perfeito e esgotado". Perfeccionismo clínico não é padrão de qualidade, é fator de risco.' },
+  { id: 'micro-recuperacao', titulo: 'Férias não bastam', texto: 'Recuperação não acontece só nas férias. Micro-pausas ao longo do dia previnem mais o esgotamento do que uma semana de praia por ano.' },
+  { id: 'emocao-onda', titulo: 'Emoção é onda', texto: 'Emoção sobe, atinge o pico e desce sozinha em poucos minutos — se você não alimentar. Surfa a onda em vez de afundar com ela. (DBT)' },
+  { id: 'luto-profissional', titulo: 'Dor que é humanidade', texto: 'Perder paciente dói. Isso não é fraqueza técnica, é humanidade. Dor reconhecida vira memória; dor engolida vira sintoma.' },
+  { id: 'comparacao', titulo: 'Matemática injusta', texto: 'Comparar teu bastidor com o palco dos outros é conta que nunca fecha. Compara você de hoje com você de ontem — essa é a métrica justa.' },
+  { id: 'sono', titulo: 'Sono é conduta', texto: 'Sono é quando teu cérebro consolida o que aprendeu e limpa o estresse do dia. Proteger teu sono é proteger tua conduta clínica.' },
+  { id: 'antes-da-noticia', titulo: 'Âncora antes da notícia', texto: 'Antes de dar uma notícia difícil, uma respiração profunda te ancora. Paciente sente quando você está inteiro na sala.' },
+  { id: 'pedir-ajuda', titulo: 'Supervisão é potência', texto: 'Supervisão e terapia não são pra quem "não dá conta" — são pra quem quer dar conta por muitos anos. Os melhores têm as duas.' },
+  { id: 'cafe-mindful', titulo: 'Mindfulness de cafezinho', texto: 'Transforma o café num exercício: 30 segundos sentindo o cheiro, o calor, o gosto. Atenção plena não precisa de almofada.' },
+  { id: 'gentileza-equipe', titulo: 'Clima emocional', texto: 'Gentileza com a equipe regula o clima emocional do setor inteiro. Cuidar do colega também é cuidado com o paciente.' },
+  { id: 'protocolo-do-erro', titulo: 'Protocolo emocional do erro', texto: 'Errou? Respira, corrige o que dá, aprende o que fica e larga o resto. Culpa que não vira aprendizado é só peso.' },
+  { id: 'corpo-avisa', titulo: 'O corpo avisa antes', texto: 'Mandíbula travada, ombro alto, respiração curta: teu corpo avisa antes da mente. Fazer o escaneamento é ler o próprio prontuário.' },
+  { id: 'ritual-de-saida', titulo: 'Ritual de fim de plantão', texto: 'Lavar as mãos devagar, trocar de roupa, uma música no caminho. Teu cérebro precisa de um sinal claro de "acabou por hoje".' },
+  { id: 'autocuidado-etica', titulo: 'Autocuidado é ética', texto: 'Autocuidado em quem cuida não é egoísmo — é ética profissional. Ninguém oferece por muito tempo o que não tem.' },
+  { id: 'aceitacao', titulo: 'Acompanhar o incontrolável', texto: 'Tem dor que não se resolve, se acompanha. Aceitar o que não controlamos libera energia pro que controlamos. Sabedoria da ACT.' },
+  { id: 'tres-respiros', titulo: 'Regra dos 3 respiros', texto: 'Antes de responder mensagem difícil, atender chamada tensa ou entrar em sala pesada: três respiros. Simples assim, funciona assim.' },
+  { id: 'gratidao-especifica', titulo: 'Gratidão com detalhe', texto: 'Gratidão genérica pouco muda; específica transforma: "sou grato à colega que segurou minha barra às 15h". O detalhe é o que o cérebro grava.' },
+  { id: 'voce-importa', titulo: 'Não esquece', texto: 'Quantas pessoas já respiraram melhor porque você existe na profissão? Pois é. Não esquece disso na quinta-feira difícil.' },
+];
+
+const tagsCheckin = ['Plantão puxado', 'Caso difícil', 'Dia bom', 'Cansaço', 'Equipe boa', 'Outro'];
+
+const acolhimento =
+  'Percebi uns dias difíceis seguidos por aqui. Você merece o mesmo cuidado que oferece — conversar com alguém de confiança ou um profissional ajuda de verdade. E se apertar, o CVV escuta 24h: ligue 188. 💛';
+
+module.exports = { microPausas, exercicios, convites, falinhas, pilulas, tagsCheckin, acolhimento };

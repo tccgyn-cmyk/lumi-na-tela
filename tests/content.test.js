@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { microPausas, exercicios, convites, falinhas } from '../src/shared/content.js';
+import { microPausas, exercicios, convites, falinhas, pilulas, tagsCheckin, acolhimento } from '../src/shared/content.js';
 
 describe('Conteúdo', () => {
   it('tem pelo menos 10 micro-pausas com titulo e texto', () => {
@@ -44,8 +44,24 @@ describe('Conteúdo', () => {
   });
 
   it('todo tipo do rodizio tem convites', () => {
-    for (const t of ['micro-pausa', 'respiracao']) {
+    for (const t of ['micro-pausa', 'respiracao', 'pilula']) {
       expect(Array.isArray(convites[t]) && convites[t].length > 0).toBe(true);
     }
+  });
+
+  it('tem pelo menos 28 pilulas com id, titulo e texto unicos', () => {
+    expect(pilulas.length).toBeGreaterThanOrEqual(28);
+    for (const p of pilulas) {
+      expect(p.id).toBeTruthy();
+      expect(p.titulo).toBeTruthy();
+      expect(p.texto).toBeTruthy();
+      expect(p.texto.length).toBeLessThanOrEqual(320);
+    }
+    expect(new Set(pilulas.map((p) => p.id)).size).toBe(pilulas.length);
+  });
+
+  it('tem tags de check-in e mensagem de acolhimento com CVV', () => {
+    expect(tagsCheckin.length).toBeGreaterThanOrEqual(5);
+    expect(acolhimento).toContain('188');
   });
 });
