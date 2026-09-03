@@ -220,16 +220,19 @@ function finalizarCta(resp) {
   ctaAtivo = null;
   clearTimeout(ctaTimeout);
   ctaTimeout = null;
-  bolhaOcupadaAte = 0;
-  if (resp === 'ver' && produtos[produto]) {
-    // Allowlist: só URLs do mapa embutido chegam aqui
-    shell.openExternal(produtos[produto].url).catch((err) => {
-      console.error('[lumi] falha ao abrir link', err);
-    });
-  }
+  bolhaOcupadaAte = Date.now() + 1000; // respiro antes do próximo dono do balão
   if (lumiAlive()) {
     lumiWin.setIgnoreMouseEvents(true, { forward: true });
     lumiWin.webContents.send('lumi-state', { state: 'idle' });
+  }
+  if (resp === 'ver' && Object.prototype.hasOwnProperty.call(produtos, produto)) {
+    try {
+      shell.openExternal(produtos[produto].url).catch((err) => {
+        console.error('[lumi] falha ao abrir link', err);
+      });
+    } catch (err) {
+      console.error('[lumi] falha ao abrir link', err);
+    }
   }
 }
 
@@ -458,14 +461,21 @@ if (!gotLock) {
       ipcMain.on('compartilhar-pilula', (e, dataUrl, id) => {
         const win = BrowserWindow.fromWebContents(e.sender);
         if (!win || win !== activityWin || win.isDestroyed()) return;
+        const responder = (ok) => {
+          if (!e.sender.isDestroyed()) e.sender.send('pilula-compartilhada', ok);
+        };
         try {
           if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/png;base64,')) {
-            e.sender.send('pilula-compartilhada', false);
+            responder(false);
+            return;
+          }
+          if (dataUrl.length > 8_000_000) {
+            responder(false);
             return;
           }
           const img = nativeImage.createFromDataURL(dataUrl);
           if (img.isEmpty()) {
-            e.sender.send('pilula-compartilhada', false);
+            responder(false);
             return;
           }
           clipboard.writeImage(img);
@@ -475,10 +485,10 @@ if (!gotLock) {
             String(id || 'pilula').replace(/[^a-z0-9-]/gi, '').slice(0, 40) || 'pilula';
           const arquivo = path.join(dir, `pilula-${nomeId}-${diaISO(Date.now())}.png`);
           fs.writeFileSync(arquivo, img.toPNG());
-          e.sender.send('pilula-compartilhada', true);
+          responder(true);
         } catch (err) {
           console.error('[lumi] falha ao compartilhar pílula', err);
-          e.sender.send('pilula-compartilhada', false);
+          responder(false);
         }
       });
 

@@ -27,6 +27,18 @@ describe('validarRemoto', () => {
     expect(validarRemoto({ ctas: [{ produto: 'nao-existe', texto: 'x' }] })).toBe(false);
     expect(validarRemoto({ desconhecida: [1] })).toBe(false);
   });
+
+  it('rejeita textos alem dos limites de layout', () => {
+    expect(validarRemoto({ falinhas: [{ texto: 'x'.repeat(201) }] })).toBe(false);
+    expect(
+      validarRemoto({ pilulas: [{ id: 'a', titulo: 't', texto: 'x'.repeat(321) }] })
+    ).toBe(false);
+  });
+
+  it('rejeita chaves herdadas como produto (prototype pollution)', () => {
+    expect(validarRemoto({ ctas: [{ produto: '__proto__', texto: 'x' }] })).toBe(false);
+    expect(validarRemoto({ ctas: [{ produto: 'constructor', texto: 'x' }] })).toBe(false);
+  });
 });
 
 describe('aplicarRemoto', () => {

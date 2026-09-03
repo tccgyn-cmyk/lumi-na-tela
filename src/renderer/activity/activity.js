@@ -7,6 +7,7 @@ const passosEl = document.getElementById('passos');
 const textoEl = document.getElementById('texto');
 const btnShare = document.getElementById('btn-share');
 let itemAtual = null;
+let shareGuard = null;
 
 window.activityAPI.onData((item) => {
   tituloEl.textContent = item.titulo || '';
@@ -104,15 +105,18 @@ function gerarStory(item, done) {
   const medir = (s) => ctx.measureText(s).width;
 
   // Mede o conteúdo ANTES de desenhar: o cartão abraça o texto
-  ctx.font = 'bold 58px "Segoe UI", sans-serif';
+  ctx.font = 'bold 58px "Segoe UI", "Helvetica Neue", Arial, sans-serif';
   const linhasTitulo = quebrarLinhas(item.titulo, 780, medir);
-  ctx.font = '44px "Segoe UI", sans-serif';
+  ctx.font = '44px "Segoe UI", "Helvetica Neue", Arial, sans-serif';
   const linhasTexto = quebrarLinhas(item.texto, 780, medir);
 
   const alturaConteudo =
     linhasTitulo.length * 72 + 60 + linhasTexto.length * 62 + 20 + 60; // título + respiro + texto + respiro + assinatura
   const cardH = alturaConteudo + 220; // padding interno
-  const cardTop = Math.max(260, Math.round((1580 - cardH) / 2) + 160);
+  const cardTop = Math.max(
+    180,
+    Math.min(Math.round((1580 - cardH) / 2) + 160, 1470 - cardH)
+  );
 
   const fundo = ctx.createLinearGradient(0, 0, 0, 1920);
   fundo.addColorStop(0, '#fdf8e8');
@@ -128,19 +132,19 @@ function gerarStory(item, done) {
   ctx.textBaseline = 'alphabetic';
 
   ctx.fillStyle = '#3f9e94';
-  ctx.font = 'bold 58px "Segoe UI", sans-serif';
+  ctx.font = 'bold 58px "Segoe UI", "Helvetica Neue", Arial, sans-serif';
   let y = desenharLinhas(ctx, linhasTitulo, 540, cardTop + 130, 72);
 
   ctx.fillStyle = '#3a3a3a';
-  ctx.font = '44px "Segoe UI", sans-serif';
+  ctx.font = '44px "Segoe UI", "Helvetica Neue", Arial, sans-serif';
   y = desenharLinhas(ctx, linhasTexto, 540, y + 60, 62);
 
   ctx.fillStyle = '#3f9e94';
-  ctx.font = 'italic 40px "Segoe UI", sans-serif';
+  ctx.font = 'italic 40px "Segoe UI", "Helvetica Neue", Arial, sans-serif';
   ctx.fillText('— @robertoribeiropsi', 540, y + 20);
 
   ctx.fillStyle = '#b09a55';
-  ctx.font = '34px "Segoe UI", sans-serif';
+  ctx.font = '34px "Segoe UI", "Helvetica Neue", Arial, sans-serif';
   ctx.fillText('feito com Lumi 💛', 540, 1830);
 
   const img = new Image();
@@ -159,12 +163,17 @@ btnShare.addEventListener('click', () => {
   if (!itemAtual) return;
   btnShare.disabled = true;
   btnShare.textContent = 'Gerando... 🎨';
+  shareGuard = setTimeout(() => {
+    btnShare.disabled = false;
+    btnShare.textContent = 'Compartilhar 📸';
+  }, 10_000);
   gerarStory(itemAtual, (dataUrl) => {
     window.activityAPI.compartilhar(dataUrl, itemAtual.id);
   });
 });
 
 window.activityAPI.onCompartilhado((ok) => {
+  clearTimeout(shareGuard);
   btnShare.textContent = ok
     ? 'Copiado e salvo em Imagens/Lumi ✨'
     : 'Ops, não consegui 😢 Tenta de novo?';

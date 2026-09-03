@@ -5,22 +5,24 @@ const conteudo = require('./content');
 const CHAVES_ATUALIZAVEIS = ['falinhas', 'pilulas', 'microPausas', 'ctas'];
 
 const formas = {
-  falinhas: (i) => Boolean(i) && typeof i.texto === 'string' && i.texto.length > 0,
+  falinhas: (i) =>
+    Boolean(i) && typeof i.texto === 'string' && i.texto.length > 0 && i.texto.length <= 200,
   pilulas: (i) =>
     Boolean(i) &&
-    typeof i.id === 'string' &&
-    typeof i.titulo === 'string' &&
-    typeof i.texto === 'string',
+    typeof i.id === 'string' && i.id.length > 0 && i.id.length <= 40 &&
+    typeof i.titulo === 'string' && i.titulo.length > 0 && i.titulo.length <= 60 &&
+    typeof i.texto === 'string' && i.texto.length > 0 && i.texto.length <= 320,
   microPausas: (i) =>
     Boolean(i) &&
-    typeof i.id === 'string' &&
-    typeof i.titulo === 'string' &&
-    typeof i.texto === 'string',
+    typeof i.id === 'string' && i.id.length > 0 && i.id.length <= 40 &&
+    typeof i.titulo === 'string' && i.titulo.length > 0 && i.titulo.length <= 60 &&
+    typeof i.texto === 'string' && i.texto.length > 0 && i.texto.length <= 320,
   ctas: (i) =>
     Boolean(i) &&
-    typeof i.texto === 'string' &&
+    typeof i.texto === 'string' && i.texto.length > 0 && i.texto.length <= 200 &&
     typeof i.produto === 'string' &&
-    Boolean(conteudo.produtos[i.produto]), // só produtos da allowlist embutida
+    // hasOwnProperty: '__proto__'/'constructor' NÃO são produtos
+    Object.prototype.hasOwnProperty.call(conteudo.produtos, i.produto),
 };
 
 function validarRemoto(json) {
