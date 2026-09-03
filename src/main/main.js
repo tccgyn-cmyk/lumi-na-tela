@@ -1,5 +1,6 @@
 const path = require('path');
-const { app, BrowserWindow, ipcMain, Menu, powerMonitor, shell } = require('electron');
+const fs = require('fs');
+const { app, BrowserWindow, ipcMain, Menu, powerMonitor, shell, nativeImage, clipboard } = require('electron');
 const { createLumiWindow } = require('./lumi-window');
 const { openActivity } = require('./activity-window');
 const { openPainel } = require('./painel-window');
@@ -449,6 +450,33 @@ if (!gotLock) {
       ipcMain.on('activity-done', (e) => {
         const win = BrowserWindow.fromWebContents(e.sender);
         if (win && !win.isDestroyed() && win !== lumiWin) win.close();
+      });
+
+      ipcMain.on('compartilhar-pilula', (e, dataUrl, id) => {
+        const win = BrowserWindow.fromWebContents(e.sender);
+        if (!win || win !== activityWin || win.isDestroyed()) return;
+        try {
+          if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/png;base64,')) {
+            e.sender.send('pilula-compartilhada', false);
+            return;
+          }
+          const img = nativeImage.createFromDataURL(dataUrl);
+          if (img.isEmpty()) {
+            e.sender.send('pilula-compartilhada', false);
+            return;
+          }
+          clipboard.writeImage(img);
+          const dir = path.join(app.getPath('pictures'), 'Lumi');
+          fs.mkdirSync(dir, { recursive: true });
+          const nomeId =
+            String(id || 'pilula').replace(/[^a-z0-9-]/gi, '').slice(0, 40) || 'pilula';
+          const arquivo = path.join(dir, `pilula-${nomeId}-${diaISO(Date.now())}.png`);
+          fs.writeFileSync(arquivo, img.toPNG());
+          e.sender.send('pilula-compartilhada', true);
+        } catch (err) {
+          console.error('[lumi] falha ao compartilhar pílula', err);
+          e.sender.send('pilula-compartilhada', false);
+        }
       });
 
       ipcMain.on('abrir-painel', (e) => {

@@ -64,4 +64,16 @@ ol { text-align: left; font-size: 14px; line-height: 1.7; padding-left: 22px; ma
   margin-top: 4px;
 }
 
+#btn-share {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #bfe6df;
+  color: #2a5a54;
+}
+#btn-share:disabled { opacity: 0.7; cursor: default; }
+
 .hidden { display: none !important; }
